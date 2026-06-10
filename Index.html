@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ALG Ops — Queen Bee</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0d;--s1:#111114;--s2:#18181c;--s3:#202026;--s4:#2a2a32;
+--b:rgba(255,255,255,.06);--b2:rgba(255,255,255,.1);--b3:rgba(255,255,255,.16);
+--tp:#f2f1ed;--ts:#8e8c8a;--tm:#52514e;
+--gold:#e8b84b;--g2:rgba(232,184,75,.15);--g3:rgba(232,184,75,.07);
+--green:#4ade80;--gn2:rgba(74,222,128,.12);
+--amber:#fbbf24;--am2:rgba(251,191,36,.12);
+--red:#f87171;--rd2:rgba(248,113,113,.12);
+--blue:#60a5fa;--bl2:rgba(96,165,250,.12);
+--purple:#a78bfa;--pu2:rgba(167,139,250,.12);
+--r:8px;--r2:12px;--r3:16px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',system-ui,sans-serif;font-size:13px;line-height:1.5;background:var(--bg);color:var(--tp);display:flex}
+/* SIDEBAR */
+#sb{width:220px;min-width:220px;height:100vh;background:var(--s1);border-right:1px solid var(--b);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;flex-shrink:0}
+.sb-logo{padding:18px 16px;border-bottom:1px solid var(--b)}
+.sb-brand{font-family:'DM Serif Display',serif;font-size:16px;color:var(--gold)}
+.sb-sub{font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+.sb-user{padding:12px 16px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:9px}
+.sb-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#b8852e);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1a1200;flex-shrink:0}
+.sb-nm{font-size:12px;font-weight:500}.sb-rl{font-size:10px;color:var(--tm)}
+.sb-sec{padding:14px 8px 2px}
+.sb-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--tm);padding:0 8px;display:block;margin-bottom:3px}
+.sb-it{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:var(--r);color:var(--ts);cursor:pointer;width:100%;border:none;background:none;font-family:inherit;font-size:12px;text-align:left;transition:background .12s,color .12s}
+.sb-it:hover{background:var(--s2);color:var(--tp)}
+.sb-it.active{background:var(--g2);color:var(--gold)}
+.sb-it svg{width:13px;height:13px;flex-shrink:0}
+.sb-bx{margin-left:auto;font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px}
+.bx-r{background:var(--rd2);color:var(--red)}.bx-a{background:var(--am2);color:var(--amber)}.bx-g{background:var(--gn2);color:var(--green)}
+.sb-ft{margin-top:auto;padding:10px 8px;border-top:1px solid var(--b);display:flex;flex-direction:column;gap:4px}
+.sb-io{display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:var(--r);color:var(--ts);background:none;border:1px solid var(--b);font-family:inherit;font-size:11px;width:100%;cursor:pointer;transition:all .12s;text-align:left}
+.sb-io:hover{background:var(--s2);color:var(--tp);border-color:var(--b2)}
+.sb-io svg{width:12px;height:12px;flex-shrink:0}
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#topbar{height:50px;background:var(--s1);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0}
+#topbar h1{font-family:'DM Serif Display',serif;font-size:17px;font-weight:400;flex:1}
+.tb-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;border:1px solid var(--b2);background:var(--s2);color:var(--ts)}
+#content{flex:1;overflow-y:auto;padding:22px 26px}
+.page{display:none}.page.active{display:block}
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+/* CARDS */
+.card{background:var(--s2);border:1px solid var(--b);border-radius:var(--r2);overflow:hidden}
+.ch{padding:12px 16px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.ct{font-size:11px;font-weight:600;color:var(--tp);display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.06em}
+.ct svg{width:12px;height:12px;color:var(--gold)}
+.cb{padding:14px 16px}
+/* STAT CARDS */
+.sc{background:var(--s2);border:1px solid var(--b);border-radius:var(--r2);padding:16px 18px;position:relative;overflow:hidden;transition:border-color .15s}
+.sc:hover{border-color:var(--b2)}
+.sc-bar{position:absolute;top:0;left:0;right:0;height:2px}
+.sc-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--tm);margin-bottom:8px}
+.sc-val{font-size:24px;font-weight:600;line-height:1}
+.sc-sub{font-size:11px;color:var(--tm);margin-top:4px}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:6px 13px;border-radius:var(--r);font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;border:1px solid var(--b2);background:transparent;color:var(--ts);transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--s3);color:var(--tp);border-color:var(--b3)}
+.btn svg{width:11px;height:11px}
+.btn-g{background:var(--g2);color:var(--gold);border-color:rgba(232,184,75,.25)}.btn-g:hover{background:rgba(232,184,75,.22)}
+.btn-r{background:var(--rd2);color:var(--red);border-color:rgba(248,113,113,.25)}.btn-r:hover{background:rgba(248,113,113,.2)}
+.btn-b{background:var(--bl2);color:var(--blue);border-color:rgba(96,165,250,.25)}.btn-b:hover{background:rgba(96,165,250,.2)}
+.btn-grn{background:var(--gn2);color:var(--green);border-color:rgba(74,222,128,.25)}
+.w100{width:100%}
+/* IO BTNS */
+.io-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--r);font-size:11px;font-weight:500;font-family:inherit;cursor:pointer;border:1px solid var(--b2);background:transparent;color:var(--tm);transition:all .15s;white-space:nowrap}
+.io-btn:hover{background:var(--s3);color:var(--ts);border-color:var(--b3)}.io-btn svg{width:11px;height:11px}
+/* PAGE HEADER */
+.ph{margin-bottom:16px}
+.ph h2{font-size:15px;font-weight:600;color:var(--tp);margin-bottom:4px}
+.ph p{font-size:12px;color:var(--tm);line-height:1.6;max-width:700px;margin-bottom:10px}
+.ph-acts{display:flex;gap:6px;flex-wrap:wrap}
+/* INPUTS */
+input[type=text],input[type=date],input[type=number],input[type=time],select,textarea{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--tp);font-family:inherit;font-size:12px;padding:7px 10px;width:100%;outline:none;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px var(--g3)}
+input::placeholder,textarea::placeholder{color:var(--tm)}
+select option{background:var(--s3)}
+textarea{resize:vertical;min-height:70px}
+label{font-size:11px;color:var(--ts);margin-bottom:3px;display:block}
+.fr{margin-bottom:11px}
+/* TAGS */
+.tag{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:4px}
+.tg{background:var(--gn2);color:var(--green)}.ta{background:var(--am2);color:var(--amber)}.tr{background:var(--rd2);color:var(--red)}.tb{background:var(--bl2);color:var(--blue)}.tp2{background:var(--pu2);color:var(--purple)}.tgo{background:var(--g2);color:var(--gold)}.ts2{background:var(--s3);color:var(--ts);border:1px solid var(--b2)}
+/* DOTS */
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dg{background:var(--green);box-shadow:0 0 5px var(--green)}.da{background:var(--amber);box-shadow:0 0 5px var(--amber)}.dr{background:var(--red);box-shadow:0 0 5px var(--red)}.db{background:var(--blue);box-shadow:0 0 5px var(--blue)}
+/* MISC */
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+.flex{display:flex}.fac{align-items:center}.gap6{gap:6px}.gap8{gap:8px}.gap10{gap:10px}.gap12{gap:12px}.gap14{gap:14px}
+.divider{height:1px;background:var(--b);margin:14px 0}
+.progress{height:3px;background:var(--s3);border-radius:2px;overflow:hidden}
+.pf{height:100%;border-radius:2px;transition:width .4s}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--tm);padding:0 11px 9px;text-align:left;border-bottom:1px solid var(--b);font-weight:500}
+td{padding:10px 11px;border-bottom:1px solid var(--b);font-size:12px;color:var(--ts);vertical-align:middle}
+td:first-child{color:var(--tp)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.015)}
+/* CHECKLIST */
+.ci{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid var(--b);cursor:pointer}
+.ci:last-child{border-bottom:none}
+.cb2{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s}
+.cb2.ck{background:var(--green);border-color:var(--green)}
+.cb2 svg{width:9px;height:9px;color:#0a1a10}
+.ct2{font-size:12px;color:var(--ts)}.ct2.dk{text-decoration:line-through;color:var(--tm)}
+/* ALERT BANNERS */
+.ab{border-radius:var(--r);padding:9px 13px;font-size:12px;display:flex;align-items:flex-start;gap:7px;margin-bottom:10px}
+.ab svg{width:12px;height:12px;flex-shrink:0;margin-top:1px}
+.ab-w{background:var(--am2);border:1px solid rgba(251,191,36,.2);color:var(--amber)}
+.ab-e{background:var(--rd2);border:1px solid rgba(248,113,113,.2);color:var(--red)}
+.ab-ok{background:var(--gn2);border:1px solid rgba(74,222,128,.2);color:var(--green)}
+.ab-i{background:var(--bl2);border:1px solid rgba(96,165,250,.2);color:var(--blue)}
+/* PILLS */
+.pill-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:13px}
+.pill{padding:5px 11px;border-radius:20px;font-size:11px;font-weight:500;border:1px solid var(--b);background:transparent;color:var(--tm);cursor:pointer;font-family:inherit;transition:all .15s}
+.pill:hover{border-color:var(--b2);color:var(--ts)}.pill.active{background:var(--g2);color:var(--gold);border-color:rgba(232,184,75,.25)}
+/* MEMBER ROW */
+.mr{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--b)}.mr:last-child{border-bottom:none}
+.mav{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.mn{font-size:13px;font-weight:500}.mrl{font-size:11px;color:var(--tm)}
+/* BOARD */
+.board-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.bcol{background:var(--s2);border:1px solid var(--b);border-radius:var(--r2);display:flex;flex-direction:column;min-height:200px}
+.bch{padding:11px 13px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between}
+.bcn{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:6px}
+.bcc{font-size:10px;padding:2px 7px;border-radius:8px;background:var(--s3);color:var(--ts);font-weight:500}
+.bc-cards{padding:8px;display:flex;flex-direction:column;gap:6px;flex:1}
+.tc{background:var(--s3);border:1px solid var(--b);border-radius:var(--r);padding:10px 11px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.tc:hover{border-color:var(--b2);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.tc-nm{font-size:12px;font-weight:500;color:var(--tp);margin-bottom:4px;line-height:1.4}
+.tc-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px}
+.tc-own{font-size:11px;color:var(--tm)}
+.tc-blk{font-size:11px;color:var(--red);display:flex;align-items:center;gap:3px;margin-top:3px}
+.tc-blk svg{width:9px;height:9px}
+.add-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:7px;margin:0 8px 8px;border:1px dashed var(--b);border-radius:var(--r);background:transparent;color:var(--tm);font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s;width:calc(100% - 16px)}
+.add-btn:hover{border-color:var(--b2);color:var(--ts);background:var(--s3)}.add-btn svg{width:10px;height:10px}
+.esc-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:7px;margin:0 8px 8px;border:1px solid rgba(248,113,113,.2);border-radius:var(--r);background:var(--rd2);color:var(--red);font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;width:calc(100% - 16px)}
+.esc-btn:hover{background:rgba(248,113,113,.2)}.esc-btn svg{width:10px;height:10px}
+/* MODALS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.modal{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:22px;width:460px;max-width:96vw;max-height:88vh;overflow-y:auto;position:relative}
+.modal-lg{width:560px}
+.modal-title{font-family:'DM Serif Display',serif;font-size:16px;color:var(--tp);margin-bottom:16px}
+.modal-close{position:absolute;top:12px;right:12px;background:var(--s3);border:1px solid var(--b2);border-radius:6px;color:var(--ts);cursor:pointer;padding:3px 8px;font-family:inherit;font-size:12px}
+/* KPI */
+.kpi-tabs{display:flex;gap:0;margin-bottom:18px;border-bottom:1px solid var(--b)}
+.kpi-tab{padding:8px 16px;font-size:12px;font-weight:500;color:var(--tm);cursor:pointer;border:none;background:none;font-family:inherit;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s}
+.kpi-tab:hover{color:var(--ts)}.kpi-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.kpi-view{display:none}.kpi-view.active{display:block}
+.km-blk{background:var(--s2);border:1px solid var(--b);border-radius:var(--r2);overflow:hidden;margin-bottom:13px}
+.km-head{padding:11px 16px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between}
+.km-nm{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:500}
+.km-row{display:flex;align-items:center;gap:8px;padding:9px 16px;border-bottom:1px solid var(--b)}
+.km-row:last-child{border-bottom:none}
+.km-row label{min-width:180px;color:var(--ts);font-size:12px;margin:0;flex-shrink:0}
+.km-row input{max-width:100px;flex-shrink:0}
+.km-row span{font-size:11px;color:var(--tm);flex:1}
+.km-row .km-score{width:80px;flex-shrink:0}
+.km-row .km-target{width:100px;flex-shrink:0;font-size:11px;color:var(--tm)}
+/* CALENDAR */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-dn{font-size:10px;text-align:center;color:var(--tm);text-transform:uppercase;letter-spacing:.06em;padding-bottom:5px}
+.cal-cell{min-height:36px;border-radius:var(--r);padding:4px 5px;font-size:11px;color:var(--ts);cursor:pointer;transition:background .12s;position:relative}
+.cal-cell:hover{background:var(--s3)}.cal-cell.today{background:var(--g2);color:var(--gold);font-weight:600}
+.cal-cell.has-ev::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--blue)}
+.cal-cell.other-m{color:var(--tm)}
+.ev-chip{border-radius:5px;padding:3px 9px;font-size:11px;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.ev-chip svg{width:10px;height:10px;flex-shrink:0}
+/* TIMELINE */
+.tl-item{display:flex;gap:11px;padding-bottom:18px;position:relative}
+.tl-item::before{content:'';position:absolute;left:15px;top:26px;bottom:0;width:1px;background:var(--b)}
+.tl-item:last-child::before{display:none}
+.tl-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--b2)}
+.tl-dot svg{width:12px;height:12px}
+.tl-ttl{font-size:13px;font-weight:500;margin-bottom:1px}.tl-sub{font-size:11px;color:var(--tm)}
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:24px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:11px 17px;font-size:13px;color:var(--tp);z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+/* ROW ITEM */
+.ri{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--b)}.ri:last-child{border-bottom:none}
+.ri-l{display:flex;align-items:center;gap:8px;color:var(--ts);font-size:12px}
+.ri-r{display:flex;align-items:center;gap:7px}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
+
+/* Monday.com KPI table */
+.kpi-board{width:100%;overflow-x:auto;margin-bottom:16px}
+.kpi-tbl{width:100%;border-collapse:collapse;min-width:700px}
+.kpi-tbl th{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--tm);padding:7px 12px;text-align:left;border-bottom:1px solid var(--b);font-weight:600;white-space:nowrap;background:var(--s3)}
+.kpi-tbl th:first-child{min-width:180px}
+.kpi-tbl th.th-del{width:36px}
+.kpi-tbl td{padding:8px 12px;border-bottom:1px solid var(--b);font-size:12px;vertical-align:middle}
+.kpi-tbl td:first-child{color:var(--tp);font-weight:500}
+.kpi-tbl tr:hover td{background:rgba(255,255,255,.015)}
+.kpi-tbl tr:last-child td{border-bottom:none}
+.kpi-cell-edit{background:none;border:none;color:inherit;font-family:inherit;font-size:12px;width:100%;cursor:pointer;text-align:left;padding:2px 4px;border-radius:4px;transition:background .12s}
+.kpi-cell-edit:hover{background:var(--s4)}
+.kpi-cell-edit:focus{background:var(--s3);outline:1px solid var(--gold);color:var(--tp)}
+.kpi-status{display:inline-flex;align-items:center;padding:3px 9px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;transition:opacity .15s;white-space:nowrap}
+.kpi-status:hover{opacity:.8}
+.ks-green{background:var(--gn2);color:var(--green)}.ks-amber{background:var(--am2);color:var(--amber)}.ks-red{background:var(--rd2);color:var(--red)}.ks-blue{background:var(--bl2);color:var(--blue)}.ks-grey{background:var(--s3);color:var(--ts)}
+.kpi-score-input{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--tp);font-family:inherit;font-size:12px;padding:4px 8px;width:80px;outline:none;transition:border-color .15s}
+.kpi-score-input:focus{border-color:var(--gold)}
+.kpi-member-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--s3);border-bottom:1px solid var(--b);border-radius:var(--r2) var(--r2) 0 0}
+.kpi-member-title{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--tp)}
+.kpi-member-actions{display:flex;gap:6px}
+.kpi-add-row{display:flex;align-items:center;gap:6px;padding:8px 12px;color:var(--tm);font-size:12px;cursor:pointer;transition:color .12s;border-top:1px dashed var(--b)}
+.kpi-add-row:hover{color:var(--ts);background:rgba(255,255,255,.02)}
+.kpi-add-row svg{width:12px;height:12px}
+.kpi-prog-bar{height:6px;background:var(--s4);border-radius:3px;overflow:hidden;width:80px}
+.kpi-prog-fill{height:100%;border-radius:3px;transition:width .4s}
+.l5-row-actions{display:flex;gap:4px}
+.focus-action-item{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--b)}
+.focus-action-item:last-child{border-bottom:none}
+.fai-l{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ts);flex:1}
+.fai-r{display:flex;align-items:center;gap:6px}
+
+</style>
+</head>
+<body>
+<!-- SIDEBAR -->
+<aside id="sb">
+  <div class="sb-logo"><div class="sb-brand">ALG</div><div class="sb-sub">American Luxury Gifts</div></div>
+  <div class="sb-user"><div class="sb-av">AT</div><div><div class="sb-nm">Aatiqa</div><div class="sb-rl">Queen Bee — Ops Manager</div></div></div>
+  <div class="sb-sec">
+    <span class="sb-lbl">Overview</span>
+    <button class="sb-it active" onclick="nav('dashboard',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</button>
+    <button class="sb-it" onclick="nav('notifications',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Notifications<span class="sb-bx bx-r" id="sb-notif-count">4</span></button>
+  </div>
+  <div class="sb-sec">
+    <span class="sb-lbl">Catalog</span>
+    <button class="sb-it" onclick="nav('trello',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="12" rx="1"/></svg>Trello Board<span class="sb-bx bx-a" id="sb-board-count">3</span></button>
+    <button class="sb-it" onclick="nav('launch5',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Launch 5</button>
+    <button class="sb-it" onclick="nav('focus5',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Focus 5</button>
+  </div>
+  <div class="sb-sec">
+    <span class="sb-lbl">Operations</span>
+    <button class="sb-it" onclick="nav('kpis',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>KPI Tracker</button>
+    <button class="sb-it" onclick="nav('inventory',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Inventory & FBA</button>
+    <button class="sb-it" onclick="nav('print',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print & Prep</button>
+    <button class="sb-it" onclick="nav('ppc',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>PPC & Ads</button>
+  </div>
+  <div class="sb-sec">
+    <span class="sb-lbl">Management</span>
+    <button class="sb-it" onclick="nav('calendar',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar</button>
+    <button class="sb-it" onclick="nav('team',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Team</button>
+    <button class="sb-it" onclick="nav('reports',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Reports</button>
+    <button class="sb-it" onclick="nav('escalations',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Escalations<span class="sb-bx bx-r" id="sb-esc-count">1</span></button>
+  </div>
+  <div class="sb-sec">
+    <span class="sb-lbl">Tools</span>
+    <button class="sb-it" onclick="nav('smm',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13"/></svg>SMM / Pinterest</button>
+    <button class="sb-it" onclick="nav('sops',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>SOPs</button>
+    <button class="sb-it" onclick="nav('settings',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
+  </div>
+  <div class="sb-ft">
+    <button class="sb-io" onclick="exportAllData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export all data</button>
+    <label class="sb-io"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import all data<input type="file" accept=".json" style="display:none" onchange="importAllData(event)"></label>
+  </div>
+</aside>
+<div id="main">
+  <header id="topbar">
+    <h1 id="page-title">Dashboard</h1>
+    <span class="tb-chip" id="tb-date"></span>
+  </header>
+  <div id="content">
+<!-- ═══ DASHBOARD ═══ -->
+<div class="page active" id="pg-dashboard">
+  <div class="ph"><h2>Command Center</h2><p>Daily starting point. Board health, agenda, team status, and your prep checklist. Everything that needs attention surfaces here first.</p></div>
+  <div id="orphan-banner" class="ab ab-e mb16" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg><span id="orphan-msg"></span></div>
+  <div class="g4 mb16">
+    <div class="sc"><div class="sc-bar" style="background:var(--green)"></div><div class="sc-lbl">On track</div><div class="sc-val" id="ds-g">0</div><div class="sc-sub">cards moving</div></div>
+    <div class="sc"><div class="sc-bar" style="background:var(--amber)"></div><div class="sc-lbl">At risk</div><div class="sc-val" id="ds-a">0</div><div class="sc-sub">need action</div></div>
+    <div class="sc"><div class="sc-bar" style="background:var(--red)"></div><div class="sc-lbl">Blocked</div><div class="sc-val" id="ds-r">0</div><div class="sc-sub">silent/stuck</div></div>
+    <div class="sc"><div class="sc-bar" style="background:var(--blue)"></div><div class="sc-lbl">Checklist done</div><div class="sc-val" id="ds-d">0</div><div class="sc-sub">prep items</div></div>
+  </div>
+  <div class="g2 mb16" style="grid-template-columns:2fr 1fr">
+    <div class="card">
+      <div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Weekly pulse</div></div>
+      <div class="cb">
+        <div class="g3 gap10 mb14">
+          <div><div style="font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">Launch 5</div><div style="font-size:20px;font-weight:600" id="dash-l5">0/5</div><div class="progress mt4"><div class="pf" id="dash-l5-bar" style="width:0%;background:var(--blue)"></div></div></div>
+          <div><div style="font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">Focus 5</div><div style="font-size:20px;font-weight:600" id="dash-f5">0/5</div><div class="progress mt4"><div class="pf" id="dash-f5-bar" style="width:0%;background:var(--green)"></div></div></div>
+          <div><div style="font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">FBA Units</div><div style="font-size:20px;font-weight:600">—</div><div class="progress mt4"><div class="pf" style="width:0%;background:var(--amber)"></div></div></div>
+        </div>
+        <div class="ab ab-w"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>Titan, Sellerboard & Amazon API access still pending — follow up with Jonathan.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg>Weekly prep</div><span style="font-size:11px;color:var(--tm)" id="prep-pct">0%</span></div>
+      <div class="cb" style="padding:8px 14px" id="mini-cl"></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Today's agenda</div></div>
+      <div class="cb" style="padding:10px 14px">
+        <div class="tl-item"><div class="tl-dot" style="background:var(--g2)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="tl-ttl">Review full Trello board</div><div class="tl-sub">EOD today · send summary to Jonathan</div></div></div>
+        <div class="tl-item"><div class="tl-dot" style="background:var(--bl2)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><div class="tl-ttl">Message Zahid, Zoya, MM</div><div class="tl-sub">Confirm role · request open card status</div></div></div>
+        <div class="tl-item"><div class="tl-dot" style="background:var(--am2)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><div class="tl-ttl">Follow up on tool access</div><div class="tl-sub">Titan · Sellerboard · Amazon API</div></div></div>
+        <div class="tl-item"><div class="tl-dot" style="background:var(--rd2)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div><div><div class="tl-ttl">Flag blocked motivational launch</div><div class="tl-sub">Assign owner · set deadline</div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Team status</div></div>
+      <div class="cb" style="padding:8px 14px">
+        <div class="mr"><div class="mav" style="background:linear-gradient(135deg,#60a5fa,#3b82f6);color:#0a1535">ZH</div><div><div class="mn">Zahid</div><div class="mrl">PPC · catalog · listings</div></div><div style="margin-left:auto;display:flex;align-items:center;gap:4px"><span class="dot dg"></span><span style="font-size:11px;color:var(--green)">Active</span></div></div>
+        <div class="mr"><div class="mav" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#0a0820">ZY</div><div><div class="mn">Zoya</div><div class="mrl">Catalog support · QA</div></div><div style="margin-left:auto;display:flex;align-items:center;gap:4px"><span class="dot dg"></span><span style="font-size:11px;color:var(--green)">Active</span></div></div>
+        <div class="mr"><div class="mav" style="background:linear-gradient(135deg,#4ade80,#16a34a);color:#0a1a10">MM</div><div><div class="mn">MM</div><div class="mrl">Listing images · A+ content</div></div><div style="margin-left:auto;display:flex;align-items:center;gap:4px"><span class="dot da"></span><span style="font-size:11px;color:var(--amber)">Pending</span></div></div>
+        <div class="mr"><div class="mav" style="background:linear-gradient(135deg,#f87171,#dc2626);color:#200a0a">EL</div><div><div class="mn">Ellen</div><div class="mrl">Inventory · FBA · accounting</div></div><div style="margin-left:auto;display:flex;align-items:center;gap:4px"><span class="dot dg"></span><span style="font-size:11px;color:var(--green)">Active</span></div></div>
+        <div class="mr"><div class="mav" style="background:linear-gradient(135deg,var(--gold),#b8852e);color:#1a1200">JC</div><div><div class="mn">Jonathan</div><div class="mrl">CEO/CMO · final approvals</div></div><div style="margin-left:auto"><span class="tag tgo">CEO</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TRELLO BOARD ═══ -->
+<div class="page" id="pg-trello">
+  <div class="ph">
+    <h2>Trello Board</h2>
+    <p>Click any card to view, edit, move, or delete it. Add cards with the + buttons. Drag-style movement is done via the Move to column selector inside each card. No card should ever have no owner — the orphan alert fires automatically.</p>
+    <div class="ph-acts">
+      <button class="io-btn" onclick="exportPage('trello')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+      <button class="btn btn-g" onclick="openNewCard('g')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New card</button>
+    </div>
+  </div>
+  <div class="flex fac gap10 mb14" style="flex-wrap:wrap;justify-content:space-between">
+    <div class="pill-row" style="margin:0">
+      <button class="pill active" onclick="filterBoard('all',this)">All</button>
+      <button class="pill" onclick="filterBoard('launch',this)">Launch 5</button>
+      <button class="pill" onclick="filterBoard('focus',this)">Focus 5</button>
+      <button class="pill" onclick="filterBoard('blocked',this)">Blocked only</button>
+    </div>
+  </div>
+  <div id="trello-orphan-bar" class="ab ab-e mb14" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg><span id="trello-orphan-msg">Cards with no owner detected.</span></div>
+  <div class="board-wrap" id="board-wrap"></div>
+</div>
+
+<!-- ═══ LAUNCH 5 ═══ -->
+<div class="page" id="pg-launch5">
+  <div class="ph">
+    <h2>Launch 5</h2>
+    <p>Track every new SKU from design through to Amazon live. Zahid owns listing copy and PPC. MM owns images and A+ content. Ellen owns FBA send-in. Click any row to edit or delete it. Add new items with the buttons below.</p>
+    <div class="ph-acts">
+      <button class="io-btn" onclick="exportPage('launch5')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+      <label class="io-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import<input type="file" accept=".json" style="display:none" onchange="importPage('launch5',event)"></label>
+    </div>
+  </div>
+  <div class="card mb14">
+    <div class="ch">
+      <div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>Launch 5 — this week</div>
+      <div style="display:flex;gap:6px">
+        <span id="l5-orphan" class="tag tr" style="display:none">Unassigned cards!</span>
+        <button class="btn btn-g" onclick="openAddSKU()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add SKU</button>
+      </div>
+    </div>
+    <div class="cb" style="padding:0">
+      <table id="l5-table">
+        <thead><tr><th>Product</th><th>Niche</th><th>Status</th><th>Owner</th><th>Progress</th><th>Due</th><th style="width:60px"></th></tr></thead>
+        <tbody id="l5-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ch">
+        <div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg>Launch checklist</div>
+        <button class="btn" onclick="openAddCheckItem('launch')" style="font-size:11px">+ Add step</button>
+      </div>
+      <div class="cb" style="padding:8px 14px" id="launch-check"></div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Progress tracker</div></div>
+      <div class="cb">
+        <div style="font-size:11px;color:var(--tm);margin-bottom:10px">SKUs in progress this week</div>
+        <div id="l5-progress-bars"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FOCUS 5 ═══ -->
+<div class="page" id="pg-focus5">
+  <div class="ph">
+    <h2>Focus 5</h2>
+    <p>Five existing ASINs getting optimization this week. Zahid owns listing copy, PPC, backend keywords. MM owns main image and A+ content. Track that the right action is happening — nothing drifts without a plan.</p>
+    <div class="ph-acts">
+      <button class="io-btn" onclick="exportPage('focus5')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+    </div>
+  </div>
+  <div class="card mb14">
+    <div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Focus 5 — optimization targets</div><button class="btn btn-g" onclick="openNewCard('g')">+ Add from board</button></div>
+    <div class="cb" style="padding:0">
+      <table>
+        <thead><tr><th>ASIN</th><th>Product</th><th>BSR</th><th>ACoS</th><th>Reviews</th><th>Priority task</th><th>Owner</th></tr></thead>
+        <tbody>
+          <tr><td style="font-family:monospace;font-size:11px">B0XXXXX001</td><td>Patriotic eagle 11×14</td><td><span style="color:var(--green);font-size:11px">↑ 12,440</span></td><td><span style="color:var(--green);font-size:11px">22%</span></td><td>14 ★4.7</td><td>A+ content — MM</td><td>MM + Zahid</td></tr>
+          <tr><td style="font-family:monospace;font-size:11px">B0XXXXX002</td><td>Equestrian portrait</td><td><span style="color:var(--ts);font-size:11px">38,200</span></td><td><span style="color:var(--red);font-size:11px">31%</span></td><td>6 ★4.2</td><td>Backend keywords</td><td>Zahid</td></tr>
+          <tr><td style="font-family:monospace;font-size:11px">B0XXXXX003</td><td>Scripture faith cross</td><td><span style="color:var(--green);font-size:11px">↑ 8,900</span></td><td><span style="color:var(--green);font-size:11px">18%</span></td><td>31 ★4.8</td><td>Vine review push</td><td>Zahid</td></tr>
+          <tr><td style="font-family:monospace;font-size:11px">B0XXXXX004</td><td>Motivational sunrise</td><td><span style="color:var(--red);font-size:11px">↓ 55,600</span></td><td><span style="color:var(--red);font-size:11px">38%</span></td><td>3 ★3.9</td><td>Main image replace — MM</td><td>MM</td></tr>
+          <tr><td style="font-family:monospace;font-size:11px">B0XXXXX005</td><td>Floral botanical 16×20</td><td><span style="color:var(--ts);font-size:11px">29,100</span></td><td><span style="color:var(--green);font-size:11px">24%</span></td><td>9 ★4.5</td><td>FBA restock</td><td>Ellen</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ch">
+        <div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Optimization actions</div>
+        <button class="btn btn-g" onclick="openAddAction()" style="font-size:11px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add action</button>
+      </div>
+      <div class="cb" style="padding:8px 14px" id="focus-actions-list"></div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>Add optimization note</div></div>
+      <div class="cb">
+        <div class="fr"><label>ASIN</label><input type="text" id="opt-asin" placeholder="B0XXXXXXXXX"></div>
+        <div class="fr"><label>Optimization type</label><select id="opt-type"><option>Listing copy (Zahid)</option><option>Main image (MM)</option><option>A+ content (MM)</option><option>Backend keywords (Zahid)</option><option>PPC bids (Zahid)</option><option>FBA restock (Ellen)</option></select></div>
+        <div class="fr"><label>Notes</label><textarea id="opt-notes" placeholder="What needs to change and why?"></textarea></div>
+        <button class="btn btn-g w100" onclick="saveOptNote()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>Save note</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ═══ KPI TRACKER ═══ -->
+<div class="page" id="pg-kpis">
+  <div class="ph">
+    <h2>KPI Tracker</h2>
+    <p>Monday.com-style board. Add columns, set targets, enter actuals, change status. Click any cell to edit inline. Each team member gets their own board. Add KPIs with <strong>+ Add column</strong> per person.</p>
+    <div class="ph-acts">
+      <button class="io-btn" onclick="exportPage('kpis')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+      <label class="io-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import<input type="file" accept=".json" style="display:none" onchange="importPage('kpis',event)"></label>
+    </div>
+  </div>
+  <div class="ab ab-w mb14"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>Live values require Sellerboard + Amazon API. Log manually until access is confirmed.</div>
+  <div class="kpi-tabs">
+    <button class="kpi-tab active" onclick="switchKpiTab('weekly',this)">Weekly board</button>
+    <button class="kpi-tab" onclick="switchKpiTab('monthly',this)">Monthly summary</button>
+    <button class="kpi-tab" onclick="switchKpiTab('quarterly',this)">Quarterly review</button>
+  </div>
+  <!-- WEEKLY BOARD -->
+  <div class="kpi-view active" id="kv-weekly">
+    <div class="flex fac gap10 mb14">
+      <label style="margin:0;white-space:nowrap;font-size:12px">Week of:</label>
+      <input type="date" id="kpi-week-date" style="max-width:160px">
+    </div>
+    <div id="kpi-weekly-blocks"></div>
+    <button class="btn btn-g" onclick="saveKPIs()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>Save weekly KPIs</button>
+  </div>
+  <!-- MONTHLY -->
+  <div class="kpi-view" id="kv-monthly">
+    <div class="ab ab-i mb14"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Monthly summary aggregates from weekly logs. Log at least 4 weeks to see trends.</div>
+    <div id="kpi-monthly-blocks"></div>
+  </div>
+  <!-- QUARTERLY -->
+  <div class="kpi-view" id="kv-quarterly">
+    <div class="ab ab-i mb14"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Quarterly review is used for the 30-60-90 day trial and formal performance discussions with Jonathan.</div>
+    <div class="card mb14">
+      <div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>Q2 2026 — Team summary</div></div>
+      <div class="cb" style="padding:0"><table><thead><tr><th>Member</th><th>Role</th><th>Cards completed</th><th>On-time %</th><th>Rating</th></tr></thead><tbody>
+        <tr><td>Zahid</td><td>PPC + catalog + listings</td><td>—</td><td>—</td><td><span class="tag ta">Pending data</span></td></tr>
+        <tr><td>MM</td><td>Images + A+ content</td><td>—</td><td>—</td><td><span class="tag ta">Pending data</span></td></tr>
+        <tr><td>Zoya</td><td>Catalog support</td><td>—</td><td>—</td><td><span class="tag ta">Pending data</span></td></tr>
+        <tr><td>Ellen</td><td>Inventory + FBA</td><td>—</td><td>—</td><td><span class="tag ta">Pending data</span></td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="g2">
+      <div class="card"><div class="ch"><div class="ct">Quarterly review — Zahid</div></div><div class="cb"><div class="fr"><label>Wins this quarter</label><textarea placeholder="What did Zahid do well?"></textarea></div><div class="fr"><label>Areas to improve</label><textarea placeholder="What needs to improve?"></textarea></div><div class="fr"><label>Rating</label><select><option>Exceeds expectations</option><option>Meets expectations</option><option>Below expectations</option><option>Needs improvement</option></select></div><button class="btn btn-g w100" onclick="toast('Review saved — Zahid ✓')">Save</button></div></div>
+      <div class="card"><div class="ch"><div class="ct">Quarterly review — MM</div></div><div class="cb"><div class="fr"><label>Wins this quarter</label><textarea placeholder="What did MM do well?"></textarea></div><div class="fr"><label>Areas to improve</label><textarea placeholder="What needs to improve?"></textarea></div><div class="fr"><label>Rating</label><select><option>Exceeds expectations</option><option>Meets expectations</option><option>Below expectations</option><option>Needs improvement</option></select></div><button class="btn btn-g w100" onclick="toast('Review saved — MM ✓')">Save</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CALENDAR ═══ -->
+<div class="page" id="pg-calendar">
+  <div class="ph">
+    <h2>Calendar</h2>
+    <p>Add your own appointments, launch deadlines, Prime Day, Father's Day — anything. Click <strong>Add event</strong> to create. All events are yours to define. Nothing is hardcoded. Use the Milestones section to pin your major season targets.</p>
+    <div class="ph-acts">
+      <button class="io-btn" onclick="exportPage('calendar')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+      <label class="io-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import<input type="file" accept=".json" style="display:none" onchange="importPage('calendar',event)"></label>
+      <button class="btn btn-g" onclick="openAddEvent()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add event</button>
+    </div>
+  </div>
+  <div class="g2" style="grid-template-columns:2fr 1fr">
+    <div class="card">
+      <div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span id="cal-month-label">June 2026</span></div>
+        <div class="flex gap6"><button class="btn" onclick="calPrev()">← Prev</button><button class="btn" onclick="calNext()">Next →</button></div>
+      </div>
+      <div class="cb"><div class="cal-grid" id="cal-grid"></div></div>
+    </div>
+    <div>
+      <div class="card mb13">
+        <div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Season milestones</div><button class="btn" onclick="openAddMilestone()" style="font-size:11px">+ Add</button></div>
+        <div class="cb" style="padding:8px 14px" id="milestones-list"></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Upcoming events</div></div>
+        <div class="cb" style="padding:8px 14px" id="upcoming-events"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ═══ INVENTORY ═══ -->
+<div class="page" id="pg-inventory">
+  <div class="ph"><h2>Inventory & FBA</h2><p>Track stock levels, flag low or out-of-stock FBA before it causes lost sales. Coordinate with Ellen on restock timing. Out-of-stock FBA kills revenue and ranking — catch it early.</p><div class="ph-acts"><button class="io-btn" onclick="exportPage('inventory')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button><label class="io-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import<input type="file" accept=".json" style="display:none" onchange="importPage('inventory',event)"></label></div></div>
+  <div class="g4 mb16">
+    <div class="sc"><div class="sc-bar" style="background:var(--green)"></div><div class="sc-lbl">In-stock SKUs</div><div class="sc-val">12</div><div class="sc-sub">FBA + FBM</div></div>
+    <div class="sc"><div class="sc-bar" style="background:var(--amber)"></div><div class="sc-lbl">Low stock</div><div class="sc-val">3</div><div class="sc-sub">Restock needed</div></div>
+    <div class="sc"><div class="sc-bar" style="background:var(--red)"></div><div class="sc-lbl">Out of stock</div><div class="sc-val">1</div><div class="sc-sub">Lost sales risk</div></div>
+    <div class="sc"><div class="sc-bar" style="background:var(--blue)"></div><div class="sc-lbl">Open shipments</div><div class="sc-val">2</div><div class="sc-sub">In transit</div></div>
+  </div>
+  <div class="card mb14"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Stock status</div></div><div class="cb" style="padding:0"><table><thead><tr><th>Product</th><th>Size</th><th>FBA units</th><th>FBM units</th><th>Status</th><th>Restock by</th></tr></thead><tbody>
+    <tr><td>Scripture faith cross</td><td>11×14</td><td>42</td><td>8</td><td><span class="tag tg">In stock</span></td><td>—</td></tr>
+    <tr><td>Patriotic eagle</td><td>11×14</td><td>18</td><td>4</td><td><span class="tag ta">Low stock</span></td><td>Jun 18</td></tr>
+    <tr><td>Floral botanical</td><td>16×20</td><td>6</td><td>2</td><td><span class="tag ta">Low stock</span></td><td>Jun 14</td></tr>
+    <tr><td>Equestrian portrait</td><td>8×10</td><td>0</td><td>11</td><td><span class="tag tr">FBA out</span></td><td style="color:var(--red)">Urgent</td></tr>
+    <tr><td>Motivational sunrise</td><td>11×17</td><td>29</td><td>0</td><td><span class="tag tg">In stock</span></td><td>—</td></tr>
+  </tbody></table></div></div>
+  <div class="g2">
+    <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h6l2 4v3h-8V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Log shipment</div></div><div class="cb"><div class="fr"><label>Product</label><input type="text" id="ship-prod" placeholder="Product name or ASIN"></div><div class="g2 gap10"><div class="fr"><label>Units</label><input type="number" id="ship-units" placeholder="0"></div><div class="fr"><label>Ship date</label><input type="date" id="ship-date"></div></div><div class="fr"><label>Notes</label><input type="text" id="ship-notes" placeholder="Carrier, tracking, etc."></div><button class="btn btn-g w100" onclick="logShipment()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Log shipment</button></div></div>
+    <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg>FBA prep checklist</div></div><div class="cb" style="padding:8px 14px" id="prep-check"></div></div>
+  </div>
+</div>
+
+<!-- ═══ PRINT & PREP ═══ -->
+<div class="page" id="pg-print">
+  <div class="ph"><h2>Print & Prep</h2><p>Every approved design moves through: print order → units received → FNSKU labels → poly-bag → FBA shipment. You own making sure each step happens on schedule.</p><div class="ph-acts"><button class="io-btn" onclick="exportPage('print')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button></div></div>
+  <div class="card mb14"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print pipeline</div></div><div class="cb" style="padding:0"><table><thead><tr><th>Product</th><th>Size</th><th>Units</th><th>Print</th><th>Prep</th><th>Ship date</th></tr></thead><tbody>
+    <tr><td>Patriotic eagle</td><td>11×14</td><td>30</td><td><span class="tag tg">Printed</span></td><td><span class="tag tg">Prepped</span></td><td>Jun 12</td></tr>
+    <tr><td>Floral botanical</td><td>16×20</td><td>20</td><td><span class="tag tg">Printed</span></td><td><span class="tag ta">In prep</span></td><td>Jun 14</td></tr>
+    <tr><td>Horror wall art</td><td>11×17</td><td>25</td><td><span class="tag ta">Waiting MM</span></td><td><span class="tag tr">Not started</span></td><td>TBD</td></tr>
+    <tr><td>Equestrian portrait</td><td>8×10</td><td>40</td><td><span class="tag tb">Ordered</span></td><td><span class="tag tr">Not started</span></td><td>Jun 18</td></tr>
+  </tbody></table></div></div>
+  <div class="g2">
+    <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New print order</div></div><div class="cb"><div class="fr"><label>Product name</label><input type="text" id="po-name" placeholder="e.g. Faith cross 8×10"></div><div class="g2 gap10"><div class="fr"><label>Size</label><select id="po-size"><option>8×10</option><option>11×14</option><option>11×17</option><option>16×20</option></select></div><div class="fr"><label>Units</label><input type="number" id="po-units" placeholder="0"></div></div><div class="g2 gap10"><div class="fr"><label>Print coord.</label><select id="po-print"><option>MM</option><option>External printer</option></select></div><div class="fr"><label>Needed by</label><input type="date" id="po-date"></div></div><button class="btn btn-g w100" onclick="createPrintOrder()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create order</button></div></div>
+    <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg>FBA send checklist</div></div><div class="cb" style="padding:8px 14px" id="print-prep-check"></div></div>
+  </div>
+</div>
+
+<!-- ═══ PPC ═══ -->
+<div class="page" id="pg-ppc">
+  <div class="ph"><h2>PPC & Ads</h2><p>Zahid manages all campaigns. Your job: track ACoS targets are being hit, action items are getting done, campaign health is reported every Monday. Flag anything above 30% ACoS to Zahid immediately.</p><div class="ph-acts"><button class="io-btn" onclick="exportPage('ppc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button></div></div>
+  <div class="ab ab-w mb14"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>Live PPC data requires Sellerboard + Amazon API. Values below are placeholders.</div>
+  <div class="g4 mb16">
+    <div class="sc"><div class="sc-bar" style="background:var(--amber)"></div><div class="sc-lbl">ACoS avg</div><div class="sc-val">—</div><div class="sc-sub">Target &lt;25%</div></div>
+    <div class="sc"><div class="sc-bar" style="background:var(--green)"></div><div class="sc-lbl">TACoS</div><div class="sc-val">—</div><div class="sc-sub">Total ad / revenue</div></div>
+    <div class="sc"><div class="sc-bar" style="background:var(--blue)"></div><div class="sc-lbl">Ad spend</div><div class="sc-val">—</div><div class="sc-sub">This week</div></div>
+    <div class="sc"><div class="sc-bar" style="background:var(--purple)"></div><div class="sc-lbl">ROAS</div><div class="sc-val">—</div><div class="sc-sub">Return on ad spend</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Campaigns</div></div><div class="cb" style="padding:0"><table><thead><tr><th>Campaign</th><th>Type</th><th>Budget</th><th>ACoS</th><th>Status</th></tr></thead><tbody>
+      <tr><td>Faith — Auto</td><td>Auto</td><td>$8/d</td><td>—</td><td><span class="tag tg">Active</span></td></tr>
+      <tr><td>Patriotic — Exact</td><td>Exact</td><td>$6/d</td><td>—</td><td><span class="tag tg">Active</span></td></tr>
+      <tr><td>Motivational — Broad</td><td>Broad</td><td>$5/d</td><td>—</td><td><span class="tag ta">Review</span></td></tr>
+      <tr><td>Equestrian — Phrase</td><td>Phrase</td><td>$4/d</td><td>—</td><td><span class="tag tg">Active</span></td></tr>
+      <tr><td>Horror — Auto</td><td>Auto</td><td>$3/d</td><td>—</td><td><span class="tag tr">Paused</span></td></tr>
+    </tbody></table></div></div>
+    <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg>PPC actions</div></div><div class="cb" style="padding:8px 14px">
+      <div class="ri"><div class="ri-l"><span class="dot dr"></span>Motivational — pause broad match (Zahid)</div><div class="ri-r"><span class="tag tr">Urgent</span></div></div>
+      <div class="ri"><div class="ri-l"><span class="dot da"></span>Equestrian — add negative KWs (Zahid)</div><div class="ri-r"><span class="tag ta">This week</span></div></div>
+      <div class="ri"><div class="ri-l"><span class="dot db"></span>Horror — activate auto once MM image ready</div><div class="ri-r"><span class="tag tb">Pending MM</span></div></div>
+      <div class="ri"><div class="ri-l"><span class="dot dg"></span>Faith — harvest KW to exact (Zahid)</div><div class="ri-r"><span class="tag tg">Zahid</span></div></div>
+      <div class="divider"></div>
+      <div class="fr"><label>Log PPC note</label><input type="text" id="ppc-note" placeholder="e.g. Increased bid on B0XXXX to $1.20"></div>
+      <button class="btn w100" onclick="logPPCNote()">Save note</button>
+    </div></div>
+  </div>
+</div>
+
+<!-- ═══ TEAM ═══ -->
+<div class="page" id="pg-team">
+  <div class="ph"><h2>Team</h2><p>Directory of every team member with scope and open task count. Push Zahid and MM directly first. Only bring it to Jonathan after you've followed up and they haven't responded. Zahid's model — owns it and finishes it — is the standard.</p><div class="ph-acts"><button class="io-btn" onclick="exportPage('team')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button></div></div>
+  <div class="g2">
+    <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Team directory</div></div><div class="cb" style="padding:8px 14px">
+      <div class="mr"><div class="mav" style="background:linear-gradient(135deg,#60a5fa,#3b82f6);color:#0a1535">ZH</div><div style="flex:1"><div class="mn">Zahid</div><div class="mrl">Brand Manager — PPC, catalog, listings, content, promos, launches</div></div><span class="tag tg">Active</span></div>
+      <div class="mr"><div class="mav" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#0a0820">ZY</div><div style="flex:1"><div class="mn">Zoya</div><div class="mrl">Catalog support — listing updates, QA, catalog tasks</div></div><span class="tag tg">Active</span></div>
+      <div class="mr"><div class="mav" style="background:linear-gradient(135deg,#4ade80,#16a34a);color:#0a1a10">MM</div><div style="flex:1"><div class="mn">MM</div><div class="mrl">Listing images, A+ content, asset creation, automation</div></div><span class="tag ta">Pending</span></div>
+      <div class="mr"><div class="mav" style="background:linear-gradient(135deg,#f87171,#dc2626);color:#200a0a">EL</div><div style="flex:1"><div class="mn">Ellen</div><div class="mrl">Accounting, tax, inventory, FBA/FBM, prep & shipping</div></div><span class="tag tg">Active</span></div>
+      <div class="mr"><div class="mav" style="background:linear-gradient(135deg,var(--gold),#b8852e);color:#1a1200">AT</div><div style="flex:1"><div class="mn">Aatiqa (You)</div><div class="mrl">Queen Bee — Ops manager, Trello owner, KPI reporting, SMM, EA</div></div><span class="tag tgo">Queen Bee</span></div>
+      <div class="mr"><div class="mav" style="background:linear-gradient(135deg,#e8b84b,#b8852e);color:#1a1200">JC</div><div style="flex:1"><div class="mn">Jonathan Craddock</div><div class="mrl">CEO/CMO — vision, strategy, product direction, final approvals</div></div><span class="tag tgo">CEO</span></div>
+    </div></div>
+    <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Assign task</div></div><div class="cb">
+      <div class="fr"><label>Task description</label><input type="text" id="task-desc" placeholder="Task to assign"></div>
+      <div class="g2 gap10"><div class="fr"><label>Assign to</label><select id="task-owner"><option>Zahid</option><option>Zoya</option><option>MM</option><option>Ellen</option></select></div><div class="fr"><label>Due date</label><input type="date" id="task-due"></div></div>
+      <button class="btn btn-g w100" onclick="assignTask()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Assign task</button>
+    </div></div>
+  </div>
+</div>
+
+<!-- ═══ REPORTS ═══ -->
+<div class="page" id="pg-reports">
+  <div class="ph"><h2>Reports</h2><p>Build your weekly Jonathan report every Monday before your 1 PM EST sync. Board status first, then KPIs, wins, blockers, top 3 priorities. Short and decision-ready — Jonathan reads for action, not updates.</p><div class="ph-acts"><button class="io-btn" onclick="exportPage('reports')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button><label class="io-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import<input type="file" accept=".json" style="display:none" onchange="importPage('reports',event)"></label></div></div>
+  <div class="g2">
+    <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Weekly report — Jonathan</div></div><div class="cb">
+      <div style="background:var(--g3);border:1px solid rgba(232,184,75,.1);border-radius:var(--r);padding:9px 13px;margin-bottom:12px;font-size:11px;color:rgba(232,184,75,.8)">📋 Board status first → KPIs → wins → blockers → top 3 priorities. 2–3 lines max per section.</div>
+      <div class="fr"><label>Week ending (Friday)</label><input type="date" id="rpt-week"></div>
+      <div class="fr"><label>Board status — Friday close</label><textarea id="rpt-board" placeholder="On track: X · At risk: X (who/what) · Blocked: X&#10;Orphaned cards: 0 (must be zero every Friday)&#10;MM card completion rate: X%"></textarea></div>
+      <div class="fr"><label>KPI highlights</label><textarea id="rpt-kpis" placeholder="ACoS: X% (target &lt;25%) · TACoS: X% · Ad spend: $X&#10;Units shipped: X · New SKUs live: X · Revenue: $X"></textarea></div>
+      <div class="fr"><label>Wins this week</label><textarea id="rpt-wins" placeholder="2–3 bullets max"></textarea></div>
+      <div class="fr"><label>Blockers — needs Jonathan's decision</label><textarea id="rpt-blocks" placeholder="Only items needing his input. Not FYIs."></textarea></div>
+      <div class="fr"><label>Next week top 3 priorities</label><textarea id="rpt-priorities" placeholder="1.&#10;2.&#10;3."></textarea></div>
+      <button class="btn btn-g w100" onclick="saveReport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>Save report</button>
+    </div></div>
+    <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Report history</div></div><div class="cb">
+      <div id="report-history" style="font-size:12px;color:var(--tm);text-align:center;padding:20px 0">No reports saved yet. Save your first report above.</div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ═══ ESCALATIONS ═══ -->
+<div class="page" id="pg-escalations">
+  <div class="ph"><h2>Escalations</h2><p>Last resort — not the first move. Before logging here you must have messaged the person, followed up at least once, and given them a reasonable window. Only genuinely stuck items go to Jonathan.</p><div class="ph-acts"><button class="io-btn" onclick="exportPage('escalations')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button></div></div>
+  <div class="ab ab-e mb14"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>1 active — Motivational launch blocked 4 days, no owner. Escalate if not resolved by EOD today.</div>
+  <div class="g2">
+    <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Open escalations</div></div><div class="cb" style="padding:0"><table><thead><tr><th>Issue</th><th>Type</th><th>Days open</th><th>Status</th></tr></thead><tbody>
+      <tr><td>Motivational launch — no owner, no movement</td><td><span class="tag tb">Launch</span></td><td style="color:var(--red)">4 days</td><td><span class="tag tr">Escalate now</span></td></tr>
+    </tbody></table></div></div>
+    <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Log escalation</div></div><div class="cb">
+      <div class="fr"><label>Issue</label><textarea id="esc-issue" placeholder="What is blocked and why?"></textarea></div>
+      <div class="g2 gap10"><div class="fr"><label>Type</label><select id="esc-type"><option>Launch blocked</option><option>Team not responding</option><option>Asset missing</option><option>FBA delay</option><option>PPC anomaly</option><option>Other</option></select></div><div class="fr"><label>Days open</label><input type="number" id="esc-days" placeholder="0"></div></div>
+      <div class="fr"><label>Steps already taken</label><textarea id="esc-steps" placeholder="What did you try first?"></textarea></div>
+      <button class="btn btn-r w100" onclick="logEscalation()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Flag to Jonathan</button>
+    </div></div>
+  </div>
+</div>
+
+<!-- ═══ NOTIFICATIONS ═══ -->
+<div class="page" id="pg-notifications">
+  <div class="ph"><h2>Notifications</h2><p>Act on red items same day. Amber within 24–48 hours. Resolve or dismiss each one — don't let this list pile up.</p><div class="ph-acts"><button class="btn" onclick="toast('All marked as read ✓')">Mark all read</button></div></div>
+  <div class="card"><div class="cb" style="padding:8px 14px">
+    <div class="mr"><div class="mav" style="background:var(--rd2);color:var(--red);border-radius:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div><div><div class="mn">Motivational launch — 4 days no movement</div><div class="mrl">No owner · escalation required · just now</div></div></div>
+    <div class="mr"><div class="mav" style="background:var(--am2);color:var(--amber);border-radius:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div><div><div class="mn">Horror art mockup — MM has not responded</div><div class="mrl">Due Thursday · follow up needed · 2h ago</div></div></div>
+    <div class="mr"><div class="mav" style="background:var(--am2);color:var(--amber);border-radius:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/></svg></div><div><div class="mn">Floral print — Ellen FBA sync needed</div><div class="mrl">Ship deadline Jun 14 · confirm today · 4h ago</div></div></div>
+    <div class="mr"><div class="mav" style="background:var(--g2);color:var(--gold);border-radius:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg></div><div><div class="mn">Jonathan review approaching</div><div class="mrl">Prepare board status + KPIs + 3 priorities</div></div></div>
+  </div></div>
+</div>
+
+<!-- ═══ SMM ═══ -->
+<div class="page" id="pg-smm">
+  <div class="ph"><h2>SMM / Pinterest</h2><p>Every product launch gets at least one pin within the first week live. Pins should be emotionally driven, keyword-rich, and link directly to the Amazon listing. Aim for 5+ pins per week across all niches.</p><div class="ph-acts"><button class="io-btn" onclick="exportPage('smm')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button><button class="btn btn-g" onclick="toast('Pin added to queue ✓')">New pin</button></div></div>
+  <div class="card mb14"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13"/></svg>Pin queue</div></div><div class="cb" style="padding:0"><table><thead><tr><th>Pin title</th><th>Board</th><th>Scheduled</th><th>Status</th></tr></thead><tbody>
+    <tr><td>Bless this home — faith wall art</td><td>ALG Faith Prints</td><td>Jun 11</td><td><span class="tag tg">Scheduled</span></td></tr>
+    <tr><td>God Bless America eagle art</td><td>Patriotic Decor</td><td>Jun 12</td><td><span class="tag tg">Scheduled</span></td></tr>
+    <tr><td>She believed she could</td><td>ALG Motivational</td><td>Jun 13</td><td><span class="tag ta">Draft</span></td></tr>
+    <tr><td>Equestrian portrait rustic barn</td><td>Horse Lovers</td><td>Jun 15</td><td><span class="tag tr">Not created</span></td></tr>
+  </tbody></table></div></div>
+  <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create pin</div></div><div class="cb"><div class="g2 gap10"><div><div class="fr"><label>Pin title</label><input type="text" id="pin-title" placeholder="Catchy, keyword-rich title"></div><div class="fr"><label>Description</label><textarea id="pin-desc" placeholder="Keywords, emotion, room type, gift angle..." style="min-height:58px"></textarea></div></div><div><div class="g2 gap10"><div class="fr"><label>Board</label><select id="pin-board"><option>ALG Faith Prints</option><option>Patriotic Decor</option><option>ALG Motivational</option><option>Nature Prints</option><option>Horse Lovers</option><option>Horror Art</option></select></div><div class="fr"><label>Schedule</label><input type="date" id="pin-date"></div></div><div class="fr"><label>Amazon link</label><input type="text" id="pin-link" placeholder="https://amazon.com/dp/..."></div><button class="btn btn-g w100" onclick="createPin()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add to queue</button></div></div></div></div>
+</div>
+
+<!-- ═══ SOPs ═══ -->
+<div class="page" id="pg-sops">
+  <div class="ph"><h2>SOPs</h2><p>Document every recurring process you own. If something took you longer than 30 minutes to figure out, write it down so it takes 5 minutes next time. These become training documents when ALG scales.</p><div class="ph-acts"><button class="io-btn" onclick="exportPage('sops')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button><button class="btn btn-g" onclick="toast('New SOP created ✓')">New SOP</button></div></div>
+  <div class="card mb14"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg>SOP library</div></div><div class="cb" style="padding:0"><table><thead><tr><th>Title</th><th>Category</th><th>Owner</th><th>Status</th></tr></thead><tbody>
+    <tr><td>Weekly Trello board review</td><td><span class="tag tgo">Operations</span></td><td>Aatiqa</td><td><span class="tag tg">Live</span></td></tr>
+    <tr><td>Launch 5 execution flow</td><td><span class="tag tb">Launch</span></td><td>Zahid + Aatiqa</td><td><span class="tag tg">Live</span></td></tr>
+    <tr><td>FBA prep and send-in</td><td><span class="tag ta">Inventory</span></td><td>Ellen</td><td><span class="tag ta">Draft</span></td></tr>
+    <tr><td>PPC campaign structure</td><td><span class="tag tp2">PPC</span></td><td>Zahid</td><td><span class="tag tr">Not started</span></td></tr>
+    <tr><td>Pinterest pin cadence</td><td><span class="tag tg">SMM</span></td><td>Aatiqa</td><td><span class="tag tr">Not started</span></td></tr>
+  </tbody></table></div></div>
+  <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create SOP</div></div><div class="cb"><div class="fr"><label>Title</label><input type="text" id="sop-title" placeholder="e.g. Print order creation process"></div><div class="g2 gap10"><div class="fr"><label>Category</label><select id="sop-cat"><option>Operations</option><option>Launch</option><option>Inventory</option><option>Reporting</option><option>PPC</option><option>SMM</option><option>Design</option></select></div><div class="fr"><label>Owner</label><select id="sop-owner"><option>Aatiqa</option><option>Zahid</option><option>Zoya</option><option>MM</option><option>Ellen</option></select></div></div><div class="fr"><label>Steps (one per line)</label><textarea id="sop-steps" placeholder="1. First step&#10;2. Second step&#10;3. Third step..."></textarea></div><button class="btn btn-g w100" onclick="createSOP()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg>Save SOP</button></div></div>
+</div>
+
+<!-- ═══ SETTINGS ═══ -->
+<div class="page" id="pg-settings">
+  <div class="ph"><h2>Settings</h2><p>Configure your workspace, confirm tool access, and review the 30-60-90 trial milestones. Chase outstanding access items weekly until all confirmed.</p><div class="ph-acts"><button class="io-btn" onclick="exportPage('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button></div></div>
+  <div class="g2 mb14">
+    <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>Workspace</div></div><div class="cb"><div class="fr"><label>Your name</label><input type="text" value="Aatiqa"></div><div class="fr"><label>Role title</label><input type="text" value="Queen Bee — Operations Manager"></div><div class="fr"><label>Brand</label><input type="text" value="American Luxury Gifts (ALG)"></div><div class="fr"><label>Weekly review time</label><select><option>Monday 1:00 PM EST</option><option>Thursday 12:00 PM EST</option></select></div><button class="btn btn-g w100" onclick="toast('Settings saved ✓')">Save settings</button></div></div>
+    <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>Tool access</div></div><div class="cb" style="padding:8px 14px">
+      <div class="ri"><div class="ri-l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Titan dashboard</div><span class="tag ta">Pending</span></div>
+      <div class="ri"><div class="ri-l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7"/></svg>Sellerboard</div><span class="tag ta">Pending</span></div>
+      <div class="ri"><div class="ri-l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4"/></svg>Amazon API / reports</div><span class="tag tr">Not set up</span></div>
+      <div class="ri"><div class="ri-l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><rect x="3" y="3" width="7" height="18" rx="1"/></svg>Trello board (full)</div><span class="tag ta">Confirm</span></div>
+      <div class="ri"><div class="ri-l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53"/></svg>Pinterest business</div><span class="tag tg">Confirmed</span></div>
+      <div style="margin-top:12px"><button class="btn btn-g w100" onclick="toast('Access request sent to Jonathan ✓')">Send access request</button></div>
+    </div></div>
+  </div>
+  <div class="card"><div class="ch"><div class="ct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>30-60-90 trial milestones</div></div><div class="cb"><div class="g3">
+    <div style="background:var(--s3);border-radius:var(--r);padding:13px"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin-bottom:5px">30-day — Jul 10</div><div style="font-size:11px;color:var(--tm)">Board owned, KPIs flowing, first full review cycle complete</div></div>
+    <div style="background:var(--s3);border-radius:var(--r);padding:13px"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin-bottom:5px">60-day — Aug 10</div><div style="font-size:11px;color:var(--tm)">Launches hitting targets, SOPs live, team cadence established</div></div>
+    <div style="background:var(--s3);border-radius:var(--r);padding:13px"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin-bottom:5px">90-day review — Sep 10</div><div style="font-size:11px;color:var(--tm)">Formal title & compensation review — based on execution</div></div>
+  </div></div></div>
+</div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- MODALS -->
+
+<!-- Add SKU modal -->
+<div class="overlay" id="addsku-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addsku-overlay')">✕</button>
+    <div class="modal-title">Add SKU to Launch 5</div>
+    <div class="fr"><label>Product name</label><input type="text" id="sku-name" placeholder="e.g. Faith cross 11×14"></div>
+    <div class="g2 gap10">
+      <div class="fr"><label>Niche</label><select id="sku-niche"><option>Faith</option><option>Patriotic</option><option>Motivational</option><option>Equestrian</option><option>Nature/Floral</option><option>Horror</option></select></div>
+      <div class="fr"><label>Size</label><select id="sku-size"><option>8×10</option><option>11×14</option><option>11×17</option><option>16×20</option></select></div>
+    </div>
+    <div class="g2 gap10">
+      <div class="fr"><label>Owner</label><select id="sku-owner"><option>Zahid</option><option>MM</option><option>Zoya</option><option>Ellen</option><option>Unassigned</option></select></div>
+      <div class="fr"><label>Due date</label><input type="date" id="sku-due"></div>
+    </div>
+    <div class="g2 gap10">
+      <div class="fr"><label>Status</label><select id="sku-status"><option value="on-track">On track</option><option value="at-risk">At risk</option><option value="blocked">Blocked</option></select></div>
+      <div class="fr"><label>Progress %</label><input type="number" id="sku-pct" placeholder="0" min="0" max="100"></div>
+    </div>
+    <button class="btn btn-g w100" onclick="submitSKU()">Add to Launch 5</button>
+  </div>
+</div>
+<!-- Edit SKU modal -->
+<div class="overlay" id="editsku-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('editsku-overlay')">✕</button>
+    <div class="modal-title">Edit SKU</div>
+    <div class="fr"><label>Product name</label><input type="text" id="esku-name"></div>
+    <div class="g2 gap10">
+      <div class="fr"><label>Niche</label><select id="esku-niche"><option>Faith</option><option>Patriotic</option><option>Motivational</option><option>Equestrian</option><option>Nature/Floral</option><option>Horror</option></select></div>
+      <div class="fr"><label>Size</label><select id="esku-size"><option>8×10</option><option>11×14</option><option>11×17</option><option>16×20</option></select></div>
+    </div>
+    <div class="g2 gap10">
+      <div class="fr"><label>Owner</label><select id="esku-owner"><option>Zahid</option><option>MM</option><option>Zoya</option><option>Ellen</option><option>Unassigned</option></select></div>
+      <div class="fr"><label>Due date</label><input type="text" id="esku-due"></div>
+    </div>
+    <div class="g2 gap10">
+      <div class="fr"><label>Status</label><select id="esku-status"><option value="on-track">On track</option><option value="at-risk">At risk</option><option value="blocked">Blocked</option></select></div>
+      <div class="fr"><label>Progress %</label><input type="number" id="esku-pct" min="0" max="100"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-g" style="flex:1" onclick="saveEditSKU()">Save changes</button>
+      <button class="btn btn-r" onclick="deleteEditSKU()">Delete SKU</button>
+    </div>
+  </div>
+</div>
+<!-- Add checklist item modal -->
+<div class="overlay" id="addcheck-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addcheck-overlay')">✕</button>
+    <div class="modal-title" id="addcheck-title">Add checklist step</div>
+    <div class="fr"><label>Step description</label><input type="text" id="check-text" placeholder="e.g. Upload images to Seller Central"></div>
+    <button class="btn btn-g w100" onclick="submitCheckItem()">Add step</button>
+  </div>
+</div>
+<!-- Add Focus action modal -->
+<div class="overlay" id="addaction-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addaction-overlay')">✕</button>
+    <div class="modal-title">Add optimization action</div>
+    <div class="fr"><label>Action description</label><input type="text" id="action-text" placeholder="e.g. Patriotic eagle — A+ content update (MM)"></div>
+    <div class="g2 gap10">
+      <div class="fr"><label>Priority</label><select id="action-priority"><option value="urgent">Urgent</option><option value="this-week">This week</option><option value="ready">Ready</option><option value="pending">Pending</option></select></div>
+      <div class="fr"><label>Owner</label><select id="action-owner"><option>Zahid</option><option>MM</option><option>Zoya</option><option>Ellen</option><option>Aatiqa</option></select></div>
+    </div>
+    <button class="btn btn-g w100" onclick="submitAction()">Add action</button>
+  </div>
+</div>
+<!-- Add KPI column modal -->
+<div class="overlay" id="addkpicol-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addkpicol-overlay')">✕</button>
+    <div class="modal-title" id="addkpicol-title">Add KPI column</div>
+    <div class="fr"><label>Metric name</label><input type="text" id="kpicol-name" placeholder="e.g. ACoS %, Images delivered, Cards done"></div>
+    <div class="g2 gap10">
+      <div class="fr"><label>Target</label><input type="text" id="kpicol-target" placeholder="e.g. &lt;25% or 100%"></div>
+      <div class="fr"><label>Unit (optional)</label><input type="text" id="kpicol-unit" placeholder="e.g. % or # or $"></div>
+    </div>
+    <div class="fr"><label>Column type</label><select id="kpicol-type"><option value="number">Number / Score</option><option value="status">Status (traffic light)</option><option value="text">Text / Notes</option></select></div>
+    <button class="btn btn-g w100" onclick="submitKPICol()">Add column</button>
+  </div>
+</div>
+<!-- Add KPI row modal -->
+<div class="overlay" id="addkpirow-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addkpirow-overlay')">✕</button>
+    <div class="modal-title" id="addkpirow-title">Add week / row</div>
+    <div class="fr"><label>Row label</label><input type="text" id="kpirow-label" placeholder="e.g. Week of Jun 10 or Jun summary"></div>
+    <button class="btn btn-g w100" onclick="submitKPIRow()">Add row</button>
+  </div>
+</div>
+<div class="overlay" id="card-overlay">
+  <div class="modal modal-lg" id="card-modal">
+    <button class="modal-close" onclick="closeModal('card-overlay')">✕ Close</button>
+    <div id="card-modal-body"></div>
+  </div>
+</div>
+<div class="overlay" id="newcard-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('newcard-overlay')">✕</button>
+    <div class="modal-title">Add card to board</div>
+    <div class="fr"><label>Card title</label><input type="text" id="nc-title" placeholder="e.g. Faith art — A+ content"></div>
+    <div class="g2 gap10"><div class="fr"><label>Type</label><select id="nc-type"><option value="launch">Launch 5</option><option value="focus">Focus 5</option><option value="ops">Ops</option></select></div><div class="fr"><label>Column</label><select id="nc-col"><option value="g">On Track</option><option value="a">At Risk</option><option value="r">Blocked</option></select></div></div>
+    <div class="g2 gap10"><div class="fr"><label>Owner</label><select id="nc-owner"><option>Zahid</option><option>MM</option><option>Zoya</option><option>Ellen</option><option>Aatiqa</option><option>Unassigned</option></select></div><div class="fr"><label>Due date</label><input type="date" id="nc-due"></div></div>
+    <div class="fr"><label>Progress %</label><input type="number" id="nc-pct" placeholder="0" min="0" max="100"></div>
+    <div class="fr"><label>Notes / blockers</label><textarea id="nc-notes" placeholder="Context, dependencies, blockers..." style="min-height:54px"></textarea></div>
+    <button class="btn btn-g w100" onclick="submitNewCard()">Add card to board</button>
+  </div>
+</div>
+<div class="overlay" id="addevent-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addevent-overlay')">✕</button>
+    <div class="modal-title">Add event</div>
+    <div class="fr"><label>Event name</label><input type="text" id="ev-name" placeholder="e.g. Prime Day kickoff"></div>
+    <div class="g2 gap10"><div class="fr"><label>Date</label><input type="date" id="ev-date"></div><div class="fr"><label>Type</label><select id="ev-type"><option value="review">Review</option><option value="launch">Launch</option><option value="deadline">Deadline</option><option value="sync">KPI Sync</option><option value="milestone">Milestone</option></select></div></div>
+    <div class="fr"><label>Notes (optional)</label><input type="text" id="ev-notes" placeholder="Any extra context"></div>
+    <button class="btn btn-g w100" onclick="submitEvent()">Add event</button>
+  </div>
+</div>
+<div class="overlay" id="addmilestone-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addmilestone-overlay')">✕</button>
+    <div class="modal-title">Add season milestone</div>
+    <div class="fr"><label>Milestone name</label><input type="text" id="ms-name" placeholder="e.g. Prime Day — $50K target"></div>
+    <div class="g2 gap10"><div class="fr"><label>Date</label><input type="date" id="ms-date"></div><div class="fr"><label>Revenue target ($)</label><input type="number" id="ms-target" placeholder="Optional"></div></div>
+    <div class="fr"><label>Color</label><select id="ms-color"><option value="gold">Gold</option><option value="blue">Blue</option><option value="red">Red</option><option value="green">Green</option><option value="purple">Purple</option></select></div>
+    <button class="btn btn-g w100" onclick="submitMilestone()">Add milestone</button>
+  </div>
+</div>
+<div class="overlay" id="addkpi-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addkpi-overlay')">✕</button>
+    <div class="modal-title" id="addkpi-title">Add KPI</div>
+    <div class="fr"><label>Metric name</label><input type="text" id="kpi-metric-name" placeholder="e.g. ACoS %, Images delivered, Cards completed"></div>
+    <div class="g2 gap10"><div class="fr"><label>Target</label><input type="text" id="kpi-metric-target" placeholder="e.g. &lt;25% or 100%"></div><div class="fr"><label>Unit</label><input type="text" id="kpi-metric-unit" placeholder="e.g. % or # or $"></div></div>
+    <div class="fr"><label>Notes (optional)</label><input type="text" id="kpi-metric-notes" placeholder="Context for this metric"></div>
+    <button class="btn btn-g w100" onclick="submitKPI()">Add KPI</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+// ═══ NAVIGATION ═══
+const PAGES={dashboard:'pg-dashboard',notifications:'pg-notifications',trello:'pg-trello',launch5:'pg-launch5',focus5:'pg-focus5',kpis:'pg-kpis',inventory:'pg-inventory',print:'pg-print',ppc:'pg-ppc',calendar:'pg-calendar',team:'pg-team',reports:'pg-reports',escalations:'pg-escalations',smm:'pg-smm',sops:'pg-sops',settings:'pg-settings'};
+const TITLES={dashboard:'Dashboard',notifications:'Notifications',trello:'Trello Board',launch5:'Launch 5',focus5:'Focus 5',kpis:'KPI Tracker',inventory:'Inventory & FBA',print:'Print & Prep',ppc:'PPC & Ads',calendar:'Calendar',team:'Team',reports:'Reports',escalations:'Escalations',smm:'SMM / Pinterest',sops:'SOPs',settings:'Settings'};
+function nav(key,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.sb-it').forEach(i=>i.classList.remove('active'));const pg=document.getElementById(PAGES[key]);if(pg)pg.classList.add('active');if(el)el.classList.add('active');document.getElementById('page-title').textContent=TITLES[key]||key;}
+function updateDate(){document.getElementById('tb-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});}
+updateDate();
+
+// ═══ MODALS ═══
+function openModal(id){document.getElementById(id).classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+document.addEventListener('click',e=>{if(e.target.classList.contains('overlay'))e.target.classList.remove('show');});
+
+// ═══ TOAST ═══
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800);}
+
+// ═══ CHECKLISTS ═══
+let checkItems=[
+  {text:'Review full Trello board — Focus 5 and Launch 5',done:false},
+  {text:'Categorize every card: on track / at risk / blocked',done:false},
+  {text:'Message Zahid, Zoya, MM — intro + open card status',done:false},
+  {text:'Send EOD board summary to Jonathan',done:false},
+  {text:'Follow up on Titan, Sellerboard, Amazon API access',done:false},
+  {text:'Note all cards with missing owners or due dates',done:false},
+  {text:'Draft 3 weekly priorities for Jonathan review',done:false},
+];
+let launchItems=[
+  {text:'Design approved by Jonathan',done:true},
+  {text:'Image prompts sent to MM',done:true},
+  {text:'Listing copy written — title, bullets, description (Zahid)',done:false},
+  {text:'Backend keywords added (Zahid)',done:false},
+  {text:'Print order placed with MM',done:false},
+  {text:'Units prepped by Ellen',done:false},
+  {text:'FBA shipment created in Seller Central',done:false},
+  {text:'PPC campaign built and live (Zahid)',done:false},
+];
+let prepItems=[
+  {text:'Confirm print dimensions and bleed',done:false},
+  {text:'Print file sent to MM / printer',done:false},
+  {text:'Units received and inspected',done:false},
+  {text:'FNSKU labels applied',done:false},
+  {text:'Units poly-bagged and boxed',done:false},
+  {text:'FBA shipment created in Seller Central',done:false},
+  {text:'Box contents confirmed, ship date locked',done:false},
+];
+let addingChecklistFor='launch';
+function chkSVG(){return'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';}
+function renderCL(items,elId,onChange,allowDelete){
+  const el=document.getElementById(elId);if(!el)return;
+  el.innerHTML='';
+  items.forEach((item,i)=>{
+    const d=document.createElement('div');d.className='ci';d.style.cssText='display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--b)';
+    const toggle=()=>{item.done=!item.done;renderCL(items,elId,onChange,allowDelete);if(onChange)onChange();};
+    const delBtn=allowDelete?`<button onclick="deleteCheckItem(${JSON.stringify(elId)},${i})" style="margin-left:auto;background:none;border:none;color:var(--tm);cursor:pointer;font-size:12px;padding:2px 4px;flex-shrink:0" title="Delete">✕</button>`:'';
+    d.innerHTML=`<div class="cb2${item.done?' ck':''}" onclick="void(0)" style="cursor:pointer;margin-top:1px">${item.done?chkSVG():''}</div><span class="ct2${item.done?' dk':''}" style="flex:1">${item.text}</span>${delBtn}`;
+    d.querySelector('.cb2').onclick=toggle;
+    el.appendChild(d);
+  });
+  if(allowDelete){
+    const addBtn=document.createElement('button');
+    addBtn.className='add-btn';addBtn.style.cssText='width:100%;margin-top:4px';
+    addBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add step';
+    const listId=elId;
+    addBtn.onclick=()=>{addingChecklistFor=listId==='launch-check'?'launch':'prep';document.getElementById('check-text').value='';document.getElementById('addcheck-title').textContent=listId==='launch-check'?'Add launch step':'Add prep step';openModal('addcheck-overlay');};
+    el.appendChild(addBtn);
+  }
+}
+function deleteCheckItem(elId,idx){
+  if(elId==='launch-check'){launchItems.splice(idx,1);renderCL(launchItems,'launch-check',null,true);}
+  else if(elId==='prep-check'){prepItems.splice(idx,1);renderCL(prepItems,'prep-check',null,true);}
+  else if(elId==='print-prep-check'){prepItems.splice(idx,1);renderCL(prepItems,'print-prep-check',null,true);}
+  else if(elId==='mini-cl'){checkItems.splice(idx,1);renderCL(checkItems,'mini-cl',updateDashboard,false);}
+  toast('Step removed');
+}
+function openAddCheckItem(type){addingChecklistFor=type;document.getElementById('check-text').value='';document.getElementById('addcheck-title').textContent=type==='launch'?'Add launch step':'Add prep step';openModal('addcheck-overlay');}
+function submitCheckItem(){
+  const text=document.getElementById('check-text').value.trim();if(!text){toast('Enter a step');return;}
+  if(addingChecklistFor==='launch'){launchItems.push({text,done:false});renderCL(launchItems,'launch-check',null,true);}
+  else{prepItems.push({text,done:false});renderCL(prepItems,'prep-check',null,true);renderCL(prepItems,'print-prep-check',null,true);}
+  closeModal('addcheck-overlay');toast('Step added ✓');
+}
+function updateDashboard(){
+  const done=checkItems.filter(x=>x.done).length;
+  const pct=Math.round(done/checkItems.length*100);
+  const pp=document.getElementById('prep-pct');if(pp)pp.textContent=pct+'%';
+  const dsd=document.getElementById('ds-d');if(dsd)dsd.textContent=done;
+  if(typeof boardCards!=='undefined'){
+    const g=boardCards.filter(c=>c.col==='g').length,a=boardCards.filter(c=>c.col==='a').length,r=boardCards.filter(c=>c.col==='r').length;
+    const eg=document.getElementById('ds-g');if(eg)eg.textContent=g;
+    const ea=document.getElementById('ds-a');if(ea)ea.textContent=a;
+    const er=document.getElementById('ds-r');if(er)er.textContent=r;
+    const l5=boardCards.filter(c=>c.type==='launch'&&c.col!=='r').length;
+    const f5=boardCards.filter(c=>c.type==='focus'&&c.col!=='r').length;
+    const dl=document.getElementById('dash-l5');if(dl)dl.textContent=l5+'/5';
+    const df=document.getElementById('dash-f5');if(df)df.textContent=f5+'/5';
+    const dlb=document.getElementById('dash-l5-bar');if(dlb)dlb.style.width=(Math.min(l5/5,1)*100)+'%';
+    const dfb=document.getElementById('dash-f5-bar');if(dfb)dfb.style.width=(Math.min(f5/5,1)*100)+'%';
+    const sbc=document.getElementById('sb-board-count');if(sbc)sbc.textContent=a+r;
+    const orphans=boardCards.filter(c=>!c.owner||c.owner==='Unassigned');
+    const ob=document.getElementById('orphan-banner');const om=document.getElementById('orphan-msg');
+    if(ob){ob.style.display=orphans.length>0?'flex':'none';if(om&&orphans.length>0)om.textContent=orphans.length+' card'+(orphans.length>1?'s':'')+' with no owner: '+orphans.map(c=>'"'+c.title+'"').join(', ')+' — assign before EOD.';}
+  }
+}
+renderCL(checkItems,'mini-cl',updateDashboard,false);
+renderCL(launchItems,'launch-check',null,true);
+renderCL(prepItems,'prep-check',null,true);
+renderCL(prepItems,'print-prep-check',null,true);
+
+// ═══ LAUNCH 5 TABLE ═══
+let l5SKUs=[
+  {id:1,name:'Faith art 8×10',niche:'Faith',size:'8×10',status:'on-track',owner:'Zahid',pct:80,due:'Jun 13'},
+  {id:2,name:'Horror wall art',niche:'Horror',size:'11×17',status:'at-risk',owner:'MM',pct:55,due:'Jun 12'},
+  {id:3,name:'Motivational quote',niche:'Motivational',size:'11×14',status:'blocked',owner:'Unassigned',pct:15,due:'Overdue'},
+  {id:4,name:'Equestrian print',niche:'Equestrian',size:'11×14',status:'on-track',owner:'Zahid',pct:70,due:'Jun 14'},
+  {id:5,name:'Nature / floral',niche:'Nature/Floral',size:'16×20',status:'at-risk',owner:'Ellen',pct:40,due:'Jun 12'},
+];
+let nextSKUId=6;
+let editingSKUId=null;
+const STATUS_MAP={'on-track':{cls:'tg',label:'On track'},'at-risk':{cls:'ta',label:'At risk'},'blocked':{cls:'tr',label:'Blocked'}};
+const STATUS_COLORS={'on-track':'var(--green)','at-risk':'var(--amber)','blocked':'var(--red)'};
+function renderL5Table(){
+  const tbody=document.getElementById('l5-tbody');if(!tbody)return;
+  tbody.innerHTML='';
+  l5SKUs.forEach(sku=>{
+    const st=STATUS_MAP[sku.status]||STATUS_MAP['on-track'];
+    const ownerStyle=sku.owner==='Unassigned'?'color:var(--red)':'';
+    const dueStyle=(sku.due==='Overdue'||sku.status==='blocked')?'color:var(--red)':(sku.status==='at-risk'?'color:var(--amber)':'');
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td style="cursor:pointer;font-weight:500" onclick="openEditSKU(${sku.id})">${sku.name}</td>
+      <td><span style="font-size:10px;color:var(--tm)">${sku.niche} · ${sku.size}</span></td>
+      <td><span class="tag ${st.cls}" style="cursor:pointer" onclick="cycleSKUStatus(${sku.id})">${st.label}</span></td>
+      <td style="${ownerStyle}">${sku.owner}</td>
+      <td><div style="display:flex;align-items:center;gap:6px"><div class="kpi-prog-bar"><div class="kpi-prog-fill" style="width:${sku.pct}%;background:${STATUS_COLORS[sku.status]}"></div></div><span style="font-size:10px;color:var(--tm)">${sku.pct}%</span></div></td>
+      <td style="${dueStyle}">${sku.due}</td>
+      <td><div class="l5-row-actions"><button class="btn" style="padding:3px 7px;font-size:10px" onclick="openEditSKU(${sku.id})" title="Edit">✎</button><button class="btn btn-r" style="padding:3px 7px;font-size:10px" onclick="deleteSKU(${sku.id})" title="Delete">✕</button></div></td>`;
+    tbody.appendChild(tr);
+  });
+  // progress bars panel
+  const pb=document.getElementById('l5-progress-bars');if(!pb)return;
+  pb.innerHTML=l5SKUs.map(s=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:11px;color:var(--ts)">${s.name}</span><span style="font-size:10px;color:var(--tm)">${s.pct}%</span></div><div class="progress"><div class="pf" style="width:${s.pct}%;background:${STATUS_COLORS[s.status]}"></div></div></div>`).join('');
+  // orphan check
+  const orphans=l5SKUs.filter(s=>s.owner==='Unassigned');
+  const ob=document.getElementById('l5-orphan');if(ob)ob.style.display=orphans.length>0?'inline-flex':'none';
+}
+function cycleSKUStatus(id){
+  const sku=l5SKUs.find(s=>s.id===id);if(!sku)return;
+  const cycle=['on-track','at-risk','blocked'];
+  const idx=cycle.indexOf(sku.status);sku.status=cycle[(idx+1)%cycle.length];
+  renderL5Table();toast('Status updated to '+STATUS_MAP[sku.status].label);
+}
+function openAddSKU(){document.getElementById('sku-name').value='';document.getElementById('sku-pct').value='0';openModal('addsku-overlay');}
+function submitSKU(){
+  const name=document.getElementById('sku-name').value.trim();if(!name){toast('Enter a product name');return;}
+  l5SKUs.push({id:nextSKUId++,name,niche:document.getElementById('sku-niche').value,size:document.getElementById('sku-size').value,status:document.getElementById('sku-status').value,owner:document.getElementById('sku-owner').value,pct:parseInt(document.getElementById('sku-pct').value)||0,due:document.getElementById('sku-due').value||'TBD'});
+  closeModal('addsku-overlay');renderL5Table();toast('SKU "'+name+'" added ✓');
+}
+function openEditSKU(id){
+  const sku=l5SKUs.find(s=>s.id===id);if(!sku)return;editingSKUId=id;
+  document.getElementById('esku-name').value=sku.name;
+  document.getElementById('esku-niche').value=sku.niche;
+  document.getElementById('esku-size').value=sku.size;
+  document.getElementById('esku-owner').value=sku.owner;
+  document.getElementById('esku-due').value=sku.due;
+  document.getElementById('esku-status').value=sku.status;
+  document.getElementById('esku-pct').value=sku.pct;
+  openModal('editsku-overlay');
+}
+function saveEditSKU(){
+  const sku=l5SKUs.find(s=>s.id===editingSKUId);if(!sku)return;
+  sku.name=document.getElementById('esku-name').value.trim()||sku.name;
+  sku.niche=document.getElementById('esku-niche').value;
+  sku.size=document.getElementById('esku-size').value;
+  sku.owner=document.getElementById('esku-owner').value;
+  sku.due=document.getElementById('esku-due').value.trim()||sku.due;
+  sku.status=document.getElementById('esku-status').value;
+  sku.pct=parseInt(document.getElementById('esku-pct').value)||0;
+  closeModal('editsku-overlay');renderL5Table();toast('SKU updated ✓');
+}
+function deleteEditSKU(){if(!confirm('Delete this SKU?'))return;l5SKUs=l5SKUs.filter(s=>s.id!==editingSKUId);closeModal('editsku-overlay');renderL5Table();toast('SKU deleted');}
+function deleteSKU(id){if(!confirm('Delete this SKU?'))return;l5SKUs=l5SKUs.filter(s=>s.id!==id);renderL5Table();toast('SKU deleted');}
+renderL5Table();
+
+// ═══ FOCUS 5 ACTIONS ═══
+let focusActions=[
+  {id:1,text:'Motivational — replace main image',priority:'urgent',owner:'MM'},
+  {id:2,text:'Patriotic eagle — A+ content draft',priority:'this-week',owner:'MM'},
+  {id:3,text:'Scripture cross — submit 5 Vine units',priority:'ready',owner:'Zahid'},
+  {id:4,text:'Equestrian — PPC bid review',priority:'pending',owner:'Zahid'},
+  {id:5,text:'Floral 16×20 — FBA restock',priority:'this-week',owner:'Ellen'},
+];
+let nextActionId=6;
+const ACTION_TAGS={urgent:{cls:'tr',label:'Urgent'},'this-week':{cls:'ta',label:'This week'},ready:{cls:'tg',label:'Ready'},pending:{cls:'tb',label:'Pending'}};
+function renderFocusActions(){
+  const el=document.getElementById('focus-actions-list');if(!el)return;
+  if(focusActions.length===0){el.innerHTML='<div style="font-size:12px;color:var(--tm);text-align:center;padding:16px 0">No actions. Click + Add action to create one.</div>';return;}
+  el.innerHTML=focusActions.map(a=>{
+    const tag=ACTION_TAGS[a.priority]||ACTION_TAGS.pending;
+    return `<div class="focus-action-item">
+      <div class="fai-l"><span class="dot ${a.priority==='urgent'?'dr':a.priority==='this-week'?'da':a.priority==='ready'?'dg':'db'}"></span>${a.text}<span style="color:var(--tm);margin-left:4px">(${a.owner})</span></div>
+      <div class="fai-r"><span class="tag ${tag.cls}">${tag.label}</span><button onclick="deleteFocusAction(${a.id})" style="background:none;border:none;color:var(--tm);cursor:pointer;font-size:12px;padding:2px 6px;margin-left:4px" title="Delete">✕</button></div>
+    </div>`;
+  }).join('');
+}
+function openAddAction(){document.getElementById('action-text').value='';openModal('addaction-overlay');}
+function submitAction(){
+  const text=document.getElementById('action-text').value.trim();if(!text){toast('Enter action description');return;}
+  focusActions.push({id:nextActionId++,text,priority:document.getElementById('action-priority').value,owner:document.getElementById('action-owner').value});
+  closeModal('addaction-overlay');renderFocusActions();toast('Action added ✓');
+}
+function deleteFocusAction(id){focusActions=focusActions.filter(a=>a.id!==id);renderFocusActions();toast('Action removed');}
+renderFocusActions();
+
+// ═══ TRELLO BOARD ═══
+const COL={g:{label:'On Track',color:'var(--green)'},a:{label:'At Risk',color:'var(--amber)'},r:{label:'Blocked',color:'var(--red)'}};
+const TYPE={launch:{label:'Launch 5',cls:'tb'},focus:{label:'Focus 5',cls:'ts2'},ops:{label:'Ops',cls:'tp2'}};
+let boardCards=[
+  {id:1,title:'Faith art — 8×10 listing copy',type:'launch',col:'g',owner:'Zahid',due:'Jun 13',pct:80,notes:'Title and bullets done, description pending.'},
+  {id:2,title:'Patriotic A+ content update',type:'focus',col:'g',owner:'Zoya',due:'Jun 12',pct:65,notes:'Modules in progress. Awaiting MM for hero image crop.'},
+  {id:3,title:'Equestrian backend keywords',type:'focus',col:'g',owner:'Zahid',due:'Jun 11',pct:90,notes:'90% done. Final backend upload pending.'},
+  {id:4,title:'Horror art mockup — MM pending',type:'launch',col:'a',owner:'MM',due:'Jun 12',pct:55,notes:'MM has not delivered image. Follow up today.'},
+  {id:5,title:'Floral print — FBA prep delayed',type:'focus',col:'a',owner:'Ellen',due:'Jun 14',pct:40,notes:'Print ready. Ellen awaiting FBA shipment plan.'},
+  {id:6,title:'Motivational launch — no movement',type:'launch',col:'r',owner:'Unassigned',due:'Overdue',pct:15,notes:'Silent 4 days. No owner assigned. Escalation required.'},
+];
+let nextCardId=7;
+let boardFilter='all';
+let editingCard=null;
+function renderBoard(){
+  const wrap=document.getElementById('board-wrap');if(!wrap)return;
+  wrap.innerHTML='';
+  ['g','a','r'].forEach(col=>{
+    const allInCol=boardCards.filter(c=>c.col===col);
+    const visible=boardCards.filter(c=>{if(boardFilter==='blocked')return c.col==='r'&&col==='r';if(boardFilter==='all')return c.col===col;return c.col===col&&c.type===boardFilter;});
+    const borderTop=col!=='g'?`border-top:2px solid ${COL[col].color};`:'';
+    const cardsHTML=visible.map(card=>{
+      const noOwner=!card.owner||card.owner==='Unassigned';
+      const ownerStyle=noOwner?'color:var(--red)':'';
+      const blk=col==='r'?`<div class="tc-blk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>${card.notes.split('.')[0]}</div>`:'';
+      return `<div class="tc" onclick="openCard(${card.id})">
+        <div class="tc-nm">${card.title}</div>
+        <div class="tc-meta"><span class="tag ${TYPE[card.type].cls}">${TYPE[card.type].label}</span><span class="tag" style="background:var(--s4);color:${COL[col].color};border:1px solid ${COL[col].color}33">${card.pct}%</span></div>
+        <div class="tc-own" style="${ownerStyle}">Owner: ${card.owner} · ${card.due}</div>
+        ${blk}
+        <div class="progress" style="margin-top:5px"><div class="pf" style="width:${card.pct}%;background:${COL[col].color}"></div></div>
+      </div>`;
+    }).join('');
+    const escBtn=col==='r'?`<button class="esc-btn" onclick="escalateBlocked()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Escalate to Jonathan</button>`:'';
+    wrap.innerHTML+=`<div class="bcol" style="${borderTop}">
+      <div class="bch"><div class="bcn"><span class="dot" style="background:${COL[col].color};box-shadow:0 0 5px ${COL[col].color}"></span>${COL[col].label}</div><span class="bcc">${allInCol.length}</span></div>
+      <div class="bc-cards">${cardsHTML}</div>
+      <button class="add-btn" onclick="openNewCard('${col}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add card</button>
+      ${escBtn}
+    </div>`;
+  });
+  const orphans=boardCards.filter(c=>!c.owner||c.owner==='Unassigned');
+  const bar=document.getElementById('trello-orphan-bar'),msg=document.getElementById('trello-orphan-msg');
+  if(bar){bar.style.display=orphans.length>0?'flex':'none';if(msg&&orphans.length>0)msg.textContent=orphans.length+' card'+(orphans.length>1?'s':'')+' with no owner: '+orphans.map(c=>'"'+c.title+'"').join(', ');}
+  updateDashboard();
+}
+function openCard(id){
+  const card=boardCards.find(c=>c.id===id);if(!card)return;editingCard=id;
+  const colOpts=['g','a','r'].map(c=>`<option value="${c}"${card.col===c?' selected':''}>${COL[c].label}</option>`).join('');
+  const ownOpts=['Zahid','MM','Zoya','Ellen','Aatiqa','Unassigned'].map(o=>`<option${card.owner===o?' selected':''}>${o}</option>`).join('');
+  const typeOpts=Object.entries(TYPE).map(([v,t])=>`<option value="${v}"${card.type===v?' selected':''}>${t.label}</option>`).join('');
+  document.getElementById('card-modal-body').innerHTML=`
+    <div style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--tp);margin-bottom:14px">${card.title}</div>
+    <div class="fr"><label>Card title</label><input type="text" id="ec-title" value="${card.title}"></div>
+    <div class="g2 gap10"><div class="fr"><label>Move to column</label><select id="ec-col">${colOpts}</select></div><div class="fr"><label>Type</label><select id="ec-type">${typeOpts}</select></div></div>
+    <div class="g2 gap10"><div class="fr"><label>Owner</label><select id="ec-owner">${ownOpts}</select></div><div class="fr"><label>Due date</label><input type="text" id="ec-due" value="${card.due}"></div></div>
+    <div class="fr"><label>Progress (0–100)</label><input type="number" id="ec-pct" value="${card.pct}" min="0" max="100"></div>
+    <div class="fr"><label>Notes / blockers</label><textarea id="ec-notes" style="min-height:72px">${card.notes}</textarea></div>
+    <div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-g" style="flex:1" onclick="saveCard()">Save changes</button><button class="btn btn-r" onclick="deleteCard(${card.id})">Delete card</button></div>`;
+  openModal('card-overlay');
+}
+function saveCard(){
+  const card=boardCards.find(c=>c.id===editingCard);if(!card)return;
+  card.title=document.getElementById('ec-title').value.trim()||card.title;
+  card.col=document.getElementById('ec-col').value;card.type=document.getElementById('ec-type').value;
+  card.owner=document.getElementById('ec-owner').value;card.due=document.getElementById('ec-due').value.trim()||card.due;
+  card.pct=parseInt(document.getElementById('ec-pct').value)||0;card.notes=document.getElementById('ec-notes').value.trim();
+  closeModal('card-overlay');renderBoard();toast('Card updated ✓');
+}
+function deleteCard(id){if(!confirm('Delete this card?'))return;boardCards=boardCards.filter(c=>c.id!==id);closeModal('card-overlay');renderBoard();toast('Card deleted');}
+function openNewCard(col){document.getElementById('nc-title').value='';document.getElementById('nc-notes').value='';document.getElementById('nc-pct').value='0';document.getElementById('nc-col').value=col||'g';openModal('newcard-overlay');}
+function submitNewCard(){
+  const title=document.getElementById('nc-title').value.trim();if(!title){toast('Card needs a title');return;}
+  boardCards.push({id:nextCardId++,title,type:document.getElementById('nc-type').value,col:document.getElementById('nc-col').value,owner:document.getElementById('nc-owner').value,due:document.getElementById('nc-due').value||'TBD',pct:parseInt(document.getElementById('nc-pct').value)||0,notes:document.getElementById('nc-notes').value.trim()});
+  closeModal('newcard-overlay');renderBoard();toast('Card added ✓');
+}
+function filterBoard(type,btn){document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));btn.classList.add('active');boardFilter=type;renderBoard();}
+function escalateBlocked(){const n=boardCards.filter(c=>c.col==='r').length;toast('Escalation flagged to Jonathan — '+n+' blocked card'+(n!==1?'s':'')+' ✓');}
+renderBoard();
+
+// ═══ KPI TRACKER — Monday.com style ═══
+const KPI_MEMBERS=[
+  {id:'zahid',name:'Zahid',role:'PPC · Catalog · Listings',av:'ZH',grad:'135deg,#60a5fa,#3b82f6',tc:'#0a1535'},
+  {id:'mm',name:'MM',role:'Listing images · A+ content',av:'MM',grad:'135deg,#4ade80,#16a34a',tc:'#0a1a10'},
+  {id:'zoya',name:'Zoya',role:'Catalog support · QA',av:'ZY',grad:'135deg,#a78bfa,#7c3aed',tc:'#0a0820'},
+  {id:'ellen',name:'Ellen',role:'Inventory · FBA · Accounting',av:'EL',grad:'135deg,#f87171,#dc2626',tc:'#200a0a'},
+];
+let kpiData={
+  zahid:{cols:[{id:'c1',name:'ACoS %',target:'<25%',unit:'%',type:'number'},{id:'c2',name:'Listings built',target:'2–3/wk',unit:'#',type:'number'},{id:'c3',name:'Campaigns reviewed',target:'All 5',unit:'#',type:'number'},{id:'c4',name:'Cards completed',target:'100%',unit:'#',type:'number'},{id:'c5',name:'Status',target:'',unit:'',type:'status'}],rows:[]},
+  mm:{cols:[{id:'c1',name:'Images delivered',target:'Per launch',unit:'#',type:'number'},{id:'c2',name:'Card completion %',target:'100%',unit:'%',type:'number'},{id:'c3',name:'Revision rate %',target:'<15%',unit:'%',type:'number'},{id:'c4',name:'Turnaround (days)',target:'<3',unit:'days',type:'number'},{id:'c5',name:'Status',target:'',unit:'',type:'status'}],rows:[]},
+  zoya:{cols:[{id:'c1',name:'Listings QA\'d',target:'All launches',unit:'#',type:'number'},{id:'c2',name:'Errors caught',target:'0 live errors',unit:'#',type:'number'},{id:'c3',name:'Cards completed',target:'All',unit:'#',type:'number'},{id:'c4',name:'Status',target:'',unit:'',type:'status'}],rows:[]},
+  ellen:{cols:[{id:'c1',name:'Units to FBA',target:'All restocks',unit:'#',type:'number'},{id:'c2',name:'OOS incidents',target:'0',unit:'#',type:'number'},{id:'c3',name:'Shipments created',target:'On schedule',unit:'#',type:'number'},{id:'c4',name:'Status',target:'',unit:'',type:'status'}],rows:[]},
+};
+let nextColId=10;let nextRowId=1;let addingKpiFor=null;let addingRowFor=null;
+const KPI_STATUSES=[{val:'green',label:'On track',cls:'ks-green'},{val:'amber',label:'At risk',cls:'ks-amber'},{val:'red',label:'Behind',cls:'ks-red'},{val:'blue',label:'In progress',cls:'ks-blue'},{val:'grey',label:'Not started',cls:'ks-grey'}];
+
+function renderKPIBlocks(){
+  const weekly=document.getElementById('kpi-weekly-blocks');
+  const monthly=document.getElementById('kpi-monthly-blocks');
+  if(!weekly)return;
+  weekly.innerHTML='';if(monthly)monthly.innerHTML='';
+  KPI_MEMBERS.forEach(m=>{
+    const data=kpiData[m.id];
+    const cols=data.cols;const rows=data.rows;
+    const av=`<div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(${m.grad});color:${m.tc};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${m.av}</div>`;
+    // Header
+    let html=`<div class="card mb14"><div class="kpi-member-header"><div class="kpi-member-title">${av}${m.name} <span style="font-size:11px;color:var(--tm);font-weight:400;margin-left:4px">— ${m.role}</span></div><div class="kpi-member-actions">
+      <button class="btn" style="font-size:11px" onclick="openAddKPIRow('${m.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add week</button>
+      <button class="btn btn-g" style="font-size:11px" onclick="openAddKPICol('${m.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add column</button>
+    </div></div>`;
+    // Table
+    html+=`<div class="kpi-board"><table class="kpi-tbl"><thead><tr><th>Week / Period</th>`;
+    cols.forEach(c=>{html+=`<th>${c.name}${c.target?`<div style="font-size:9px;color:var(--tm);font-weight:400">Target: ${c.target}</div>`:''}<button onclick="deleteKPICol('${m.id}','${c.id}')" style="margin-left:6px;background:none;border:none;color:var(--tm);cursor:pointer;font-size:10px;opacity:.5;padding:1px 3px" title="Remove column">✕</button></th>`;});
+    html+=`<th class="th-del"></th></tr></thead><tbody>`;
+    if(rows.length===0){html+=`<tr><td colspan="${cols.length+2}" style="text-align:center;color:var(--tm);padding:18px">No data yet. Click <strong>Add week</strong> to log this week's KPIs.</td></tr>`;}
+    rows.forEach(row=>{
+      html+=`<tr><td><button class="kpi-cell-edit" onclick="editKPIRowLabel('${m.id}','${row.id}')">${row.label}</button></td>`;
+      cols.forEach(c=>{
+        const val=row.vals&&row.vals[c.id]!==undefined?row.vals[c.id]:'';
+        if(c.type==='status'){
+          const st=KPI_STATUSES.find(s=>s.val===val)||KPI_STATUSES[4];
+          html+=`<td><span class="kpi-status ${st.cls}" onclick="cycleKPIStatus('${m.id}','${row.id}','${c.id}')" title="Click to change">${st.label}</span></td>`;
+        } else {
+          html+=`<td><input class="kpi-score-input" type="${c.type==='number'?'number':'text'}" value="${val}" placeholder="—" onchange="updateKPIVal('${m.id}','${row.id}','${c.id}',this.value)" style="${val&&c.unit==='%'&&c.target&&c.target.startsWith('<')&&parseFloat(val)>parseFloat(c.target.replace('<',''))?'border-color:var(--red);':val?'border-color:var(--green);':''}"></td>`;
+        }
+      });
+      html+=`<td><button class="btn btn-r" style="padding:2px 7px;font-size:10px" onclick="deleteKPIRow('${m.id}','${row.id}')">✕</button></td></tr>`;
+    });
+    html+=`</tbody></table></div></div>`;
+    weekly.innerHTML+=html;
+    // Monthly summary
+    if(monthly){
+      monthly.innerHTML+=`<div class="card mb14"><div class="kpi-member-header"><div class="kpi-member-title">${av}${m.name} — Monthly average</div></div>
+        <div class="cb" style="padding:0">
+          <table class="kpi-tbl"><thead><tr><th>Metric</th><th>Weeks logged</th><th>Avg score</th><th>Target</th><th>Trend</th></tr></thead><tbody>
+          ${cols.filter(c=>c.type==='number').map(c=>{
+            const vals=rows.map(r=>r.vals&&r.vals[c.id]!==undefined?parseFloat(r.vals[c.id]):null).filter(v=>v!==null);
+            const avg=vals.length>0?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1):'—';
+            const trend=vals.length>1?(vals[vals.length-1]>vals[0]?'↑ Up':'↓ Down'):'—';
+            const trendColor=trend.startsWith('↑')?'var(--green)':'var(--red)';
+            return `<tr><td>${c.name}</td><td style="color:var(--ts)">${vals.length}</td><td style="color:var(--tp);font-weight:600">${avg}${c.unit?c.unit:''}</td><td style="color:var(--tm)">${c.target||'—'}</td><td style="color:${trendColor}">${trend}</td></tr>`;
+          }).join('')||`<tr><td colspan="5" style="text-align:center;color:var(--tm);padding:14px">No numeric KPIs logged yet.</td></tr>`}
+          </tbody></table>
+        </div></div>`;
+    }
+  });
+}
+function openAddKPICol(memberId){addingKpiFor=memberId;document.getElementById('kpicol-name').value='';document.getElementById('kpicol-target').value='';document.getElementById('kpicol-unit').value='';document.getElementById('addkpicol-title').textContent='Add column — '+KPI_MEMBERS.find(m=>m.id===memberId)?.name;openModal('addkpicol-overlay');}
+function submitKPICol(){
+  const name=document.getElementById('kpicol-name').value.trim();if(!name){toast('Column name required');return;}
+  kpiData[addingKpiFor].cols.push({id:'c'+(++nextColId),name,target:document.getElementById('kpicol-target').value.trim(),unit:document.getElementById('kpicol-unit').value.trim(),type:document.getElementById('kpicol-type').value});
+  closeModal('addkpicol-overlay');renderKPIBlocks();toast('Column added — '+name+' ✓');
+}
+function deleteKPICol(memberId,colId){if(!confirm('Remove this column and all its data?'))return;kpiData[memberId].cols=kpiData[memberId].cols.filter(c=>c.id!==colId);kpiData[memberId].rows.forEach(r=>{if(r.vals)delete r.vals[colId];});renderKPIBlocks();toast('Column removed');}
+function openAddKPIRow(memberId){addingRowFor=memberId;document.getElementById('kpirow-label').value='';document.getElementById('addkpirow-title').textContent='Add week — '+KPI_MEMBERS.find(m=>m.id===memberId)?.name;openModal('addkpirow-overlay');}
+function submitKPIRow(){
+  const label=document.getElementById('kpirow-label').value.trim();if(!label){toast('Row label required');return;}
+  kpiData[addingRowFor].rows.push({id:'r'+(++nextRowId),label,vals:{}});
+  closeModal('addkpirow-overlay');renderKPIBlocks();toast('Row added ✓');
+}
+function deleteKPIRow(memberId,rowId){kpiData[memberId].rows=kpiData[memberId].rows.filter(r=>r.id!==rowId);renderKPIBlocks();toast('Row removed');}
+function updateKPIVal(memberId,rowId,colId,val){const row=kpiData[memberId].rows.find(r=>r.id===rowId);if(row){if(!row.vals)row.vals={};row.vals[colId]=val;}}
+function cycleKPIStatus(memberId,rowId,colId){
+  const row=kpiData[memberId].rows.find(r=>r.id===rowId);if(!row){return;}
+  if(!row.vals)row.vals={};
+  const cur=row.vals[colId]||'grey';
+  const idx=KPI_STATUSES.findIndex(s=>s.val===cur);
+  row.vals[colId]=KPI_STATUSES[(idx+1)%KPI_STATUSES.length].val;
+  renderKPIBlocks();
+}
+function editKPIRowLabel(memberId,rowId){const row=kpiData[memberId].rows.find(r=>r.id===rowId);if(!row)return;const newLabel=prompt('Edit row label:',row.label);if(newLabel&&newLabel.trim()){row.label=newLabel.trim();renderKPIBlocks();}}
+function saveKPIs(){toast('KPIs saved ✓');}
+function switchKpiTab(tab,btn){document.querySelectorAll('.kpi-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.kpi-view').forEach(v=>v.classList.remove('active'));btn.classList.add('active');document.getElementById('kv-'+tab).classList.add('active');}
+renderKPIBlocks();
+
+// ═══ CALENDAR ═══
+let calYear=2026,calMonth=5;
+let calEvents=[];let milestones=[];
+const EV_COLORS={review:'var(--red)',launch:'var(--blue)',deadline:'var(--amber)',sync:'var(--green)',milestone:'var(--gold)'};
+const EV_BG={review:'var(--rd2)',launch:'var(--bl2)',deadline:'var(--am2)',sync:'var(--gn2)',milestone:'var(--g2)'};
+function renderCalendar(){
+  const grid=document.getElementById('cal-grid'),label=document.getElementById('cal-month-label');if(!grid)return;
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  label.textContent=MONTHS[calMonth]+' '+calYear;
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  grid.innerHTML=days.map(d=>`<div class="cal-dn">${d}</div>`).join('');
+  const first=new Date(calYear,calMonth,1).getDay();
+  const last=new Date(calYear,calMonth+1,0).getDate();
+  const today=new Date();
+  const prevLast=new Date(calYear,calMonth,0).getDate();
+  for(let i=first-1;i>=0;i--)grid.innerHTML+=`<div class="cal-cell other-m">${prevLast-i}</div>`;
+  for(let d=1;d<=last;d++){
+    const isToday=today.getFullYear()===calYear&&today.getMonth()===calMonth&&today.getDate()===d;
+    const hasEv=[...calEvents,...milestones].some(e=>{const ed=new Date(e.date);return ed.getFullYear()===calYear&&ed.getMonth()===calMonth&&ed.getDate()===d;});
+    grid.innerHTML+=`<div class="cal-cell${isToday?' today':''}${hasEv?' has-ev':''}" onclick="showDayEvents(${d})">${d}</div>`;
+  }
+  renderUpcoming();renderMilestones();
+}
+function renderUpcoming(){
+  const el=document.getElementById('upcoming-events');if(!el)return;
+  const all=[...calEvents,...milestones].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const upcoming=all.filter(e=>new Date(e.date)>=new Date()).slice(0,8);
+  if(upcoming.length===0){el.innerHTML=`<div style="font-size:12px;color:var(--tm);text-align:center;padding:12px 0">No upcoming events. Click + Add event to start.</div>`;return;}
+  el.innerHTML=upcoming.map(e=>{
+    const d=new Date(e.date);const label=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const col=EV_COLORS[e.type||'sync']||'var(--blue)';const bg=EV_BG[e.type||'sync']||'var(--bl2)';
+    return `<div class="ev-chip mb8" style="background:${bg};color:${col};border:1px solid ${col}33">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>${label} · ${e.name}${e.target?' — $'+Number(e.target).toLocaleString()+' target':''}</span>
+      <button onclick="deleteEvent('${e.id}')" style="margin-left:auto;background:none;border:none;color:inherit;cursor:pointer;font-size:11px;opacity:.6;padding:0">✕</button>
+    </div>`;
+  }).join('');
+}
+function renderMilestones(){
+  const el=document.getElementById('milestones-list');if(!el)return;
+  const MS_COLORS={gold:'var(--gold)',blue:'var(--blue)',red:'var(--red)',green:'var(--green)',purple:'var(--purple)'};
+  if(milestones.length===0){el.innerHTML=`<div style="font-size:12px;color:var(--tm);text-align:center;padding:10px 0">Click + Add to pin Father's Day, Prime Day, July 4th etc.</div>`;return;}
+  el.innerHTML=milestones.map(m=>{
+    const d=new Date(m.date);const label=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    const col=MS_COLORS[m.color||'gold']||'var(--gold)';
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--b)">
+      <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:${col};flex-shrink:0"></span><div><div style="font-size:12px;font-weight:500;color:var(--tp)">${m.name}</div><div style="font-size:11px;color:var(--tm)">${label}${m.target?' · $'+Number(m.target).toLocaleString()+' target':''}</div></div></div>
+      <button onclick="deleteMilestone('${m.id}')" style="background:none;border:none;color:var(--tm);cursor:pointer;font-size:12px;padding:2px 6px">✕</button>
+    </div>`;
+  }).join('');
+}
+function showDayEvents(day){const evs=[...calEvents,...milestones].filter(e=>{const d=new Date(e.date);return d.getFullYear()===calYear&&d.getMonth()===calMonth&&d.getDate()===day;});if(evs.length)toast(evs.map(e=>e.name).join(' · '));}
+function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();}
+function openAddEvent(){document.getElementById('ev-name').value='';document.getElementById('ev-notes').value='';openModal('addevent-overlay');}
+function submitEvent(){const name=document.getElementById('ev-name').value.trim();const date=document.getElementById('ev-date').value;if(!name||!date){toast('Name and date required');return;}calEvents.push({id:'ev'+Date.now(),name,date,type:document.getElementById('ev-type').value,notes:document.getElementById('ev-notes').value.trim()});closeModal('addevent-overlay');renderCalendar();toast('Event added ✓');}
+function deleteEvent(id){calEvents=calEvents.filter(e=>e.id!==id);milestones=milestones.filter(m=>m.id!==id);renderCalendar();toast('Removed');}
+function openAddMilestone(){document.getElementById('ms-name').value='';document.getElementById('ms-target').value='';openModal('addmilestone-overlay');}
+function submitMilestone(){const name=document.getElementById('ms-name').value.trim();const date=document.getElementById('ms-date').value;if(!name||!date){toast('Name and date required');return;}milestones.push({id:'ms'+Date.now(),name,date,target:document.getElementById('ms-target').value,color:document.getElementById('ms-color').value});closeModal('addmilestone-overlay');renderCalendar();toast('Milestone: '+name+' ✓');}
+function deleteMilestone(id){milestones=milestones.filter(m=>m.id!==id);renderCalendar();toast('Milestone removed');}
+renderCalendar();
+
+// ═══ MISC BUTTONS ═══
+function logShipment(){const p=document.getElementById('ship-prod').value.trim();if(!p){toast('Enter a product name');return;}document.getElementById('ship-prod').value='';toast('Shipment logged ✓');}
+function createPrintOrder(){const n=document.getElementById('po-name').value.trim();if(!n){toast('Enter a product name');return;}document.getElementById('po-name').value='';toast('Print order created ✓');}
+function logPPCNote(){const n=document.getElementById('ppc-note').value.trim();if(!n){toast('Enter a note');return;}document.getElementById('ppc-note').value='';toast('PPC note logged ✓');}
+function assignTask(){const d=document.getElementById('task-desc').value.trim();if(!d){toast('Enter a task description');return;}document.getElementById('task-desc').value='';toast('Task assigned to '+document.getElementById('task-owner').value+' ✓');}
+function saveOptNote(){const a=document.getElementById('opt-asin').value.trim();if(!a){toast('Enter an ASIN');return;}document.getElementById('opt-asin').value='';document.getElementById('opt-notes').value='';toast('Optimization note saved ✓');}
+function saveReport(){const w=document.getElementById('rpt-week').value;if(!w){toast('Select a week ending date');return;}const h=document.getElementById('report-history');if(h){const empty=h.querySelector('[style*="text-align:center"]');if(empty)empty.remove();const div=document.createElement('div');div.style.cssText='padding:8px 0;border-bottom:1px solid var(--b);font-size:12px;display:flex;justify-content:space-between;align-items:center';div.innerHTML=`<span style="color:var(--tp)">Week of ${w}</span><span class="tag tg">Saved</span>`;h.prepend(div);}toast('Report saved ✓');}
+function logEscalation(){const i=document.getElementById('esc-issue').value.trim();if(!i){toast('Describe the issue');return;}document.getElementById('esc-issue').value='';document.getElementById('esc-steps').value='';toast('Escalation flagged to Jonathan ✓');}
+function createPin(){const t=document.getElementById('pin-title').value.trim();if(!t){toast('Enter a pin title');return;}document.getElementById('pin-title').value='';toast('Pin added to queue ✓');}
+function createSOP(){const t=document.getElementById('sop-title').value.trim();if(!t){toast('Enter an SOP title');return;}document.getElementById('sop-title').value='';toast('SOP saved ✓');}
+
+// ═══ EXPORT / IMPORT ═══
+function gatherData(){return{exported:new Date().toISOString(),version:'4.0',brand:'ALG',boardCards,l5SKUs,focusActions,calEvents,milestones,kpiData,checkItems,launchItems,prepItems};}
+function exportAllData(){dlJSON(gatherData(),'alg-dashboard-'+today()+'.json');toast('All data exported ✓');}
+function exportPage(pg){dlJSON({page:pg,...gatherData()},'alg-'+pg+'-'+today()+'.json');toast('Exported ✓');}
+function importAllData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);applyImport(d);toast('Data imported ✓');}catch{toast('Import failed — invalid file');}};r.readAsText(f);e.target.value='';}
+function importPage(pg,e){importAllData(e);}
+function applyImport(d){
+  if(d.boardCards)boardCards=d.boardCards;
+  if(d.l5SKUs)l5SKUs=d.l5SKUs;
+  if(d.focusActions)focusActions=d.focusActions;
+  if(d.calEvents)calEvents=d.calEvents;
+  if(d.milestones)milestones=d.milestones;
+  if(d.kpiData)kpiData=d.kpiData;
+  if(d.checkItems)d.checkItems.forEach((x,i)=>{if(checkItems[i])checkItems[i].done=x.done;});
+  if(d.launchItems){launchItems=d.launchItems;}
+  if(d.prepItems){prepItems=d.prepItems;}
+  renderBoard();renderCalendar();renderKPIBlocks();renderFocusActions();renderL5Table();
+  renderCL(checkItems,'mini-cl',updateDashboard,false);
+  renderCL(launchItems,'launch-check',null,true);
+  renderCL(prepItems,'prep-check',null,true);
+  renderCL(prepItems,'print-prep-check',null,true);
+  updateDashboard();
+}
+function dlJSON(data,name){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);}
+function today(){return new Date().toISOString().slice(0,10);}
+updateDashboard();
+</script>
+</body>
+</html>
