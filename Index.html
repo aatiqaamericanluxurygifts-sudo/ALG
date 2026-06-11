@@ -1066,7 +1066,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
 const SURL='https://rndmantqgdgnpvpahfvb.supabase.co';
 const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuZG1hbnRxZ2RnbnB2cGFoZnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMTMzNDQsImV4cCI6MjA5NjY4OTM0NH0.NSrhyc3y2IUU2Cf5av12bfUSAX7FS8a1IwSHsG74L4g';
 const {createClient}=supabase;
-const sb=createClient(SURL,SKEY);
+const sb=createClient(SURL,SKEY,{
+  auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false},
+  global:{fetch:window.fetch.bind(window)}
+});
 
 function setStatus(s){
   const el=document.getElementById('db-status'),t=document.getElementById('db-status-text');
@@ -1077,19 +1080,35 @@ function setStatus(s){
 }
 async function dbUpsert(table,row){
   setStatus('saving');
-  const{error}=await sb.from(table).upsert(row,{onConflict:'id'});
-  if(error){console.error(table,error.message,error.code);setStatus('error');return false;}
-  setStatus('live');return true;
+  try{
+    const res=await fetch(`${SURL}/rest/v1/${table}`,{
+      method:'POST',
+      headers:{'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal','Accept':'application/json'},
+      body:JSON.stringify(row)
+    });
+    if(!res.ok){const t=await res.text();console.error(table,res.status,t);setStatus('error');return false;}
+    setStatus('live');return true;
+  }catch(e){console.error(table,e.message);setStatus('error');return false;}
 }
 async function dbDelete(table,id){
-  const{error}=await sb.from(table).delete().eq('id',id);
-  if(error){console.error(table,error.message);return false;}
-  return true;
+  try{
+    const res=await fetch(`${SURL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}`,{
+      method:'DELETE',
+      headers:{'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Accept':'application/json'}
+    });
+    if(!res.ok){const t=await res.text();console.error(table,res.status,t);return false;}
+    return true;
+  }catch(e){console.error(table,e.message);return false;}
 }
 async function dbLoad(table){
-  const{data,error}=await sb.from(table).select('*');
-  if(error){console.error(table,error.message,error.code);return null;}
-  return data;
+  try{
+    const res=await fetch(`${SURL}/rest/v1/${table}?select=*`,{
+      method:'GET',
+      headers:{'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Accept':'application/json'}
+    });
+    if(!res.ok){const t=await res.text();console.error(table,res.status,t);return null;}
+    return await res.json();
+  }catch(e){console.error(table,e.message);return null;}
 }
 
 // ══════════════════════════════════════════════════
@@ -1840,6 +1859,14 @@ async function applyImport(d){
 // ══════════════════════════════════════════════════
 // REALTIME
 // ══════════════════════════════════════════════════
+// Polling fallback when WebSocket unavailable
+async function pollUpdates(){
+  const cards=await dbLoad('board_cards');
+  const skus=await dbLoad('l5_skus');
+  if(cards){boardCards=cards;renderBoard();}
+  if(skus){l5SKUs=skus;renderPipeline();updateDashboard();}
+}
+
 function setupRealtime(){
   const handlers={
     board_cards:(p)=>{if(p.eventType==='DELETE')boardCards=boardCards.filter(c=>c.id!==p.old.id);else{const i=boardCards.findIndex(c=>c.id===p.new.id);i>=0?boardCards[i]=p.new:boardCards.push(p.new);}renderBoard();},
@@ -1862,9 +1889,19 @@ function setupRealtime(){
       updateDashboard();
     },
   };
-  Object.entries(handlers).forEach(([table,handler])=>{
-    sb.channel('rt_'+table).on('postgres_changes',{event:'*',schema:'public',table},handler).subscribe();
-  });
+  try{
+    Object.entries(handlers).forEach(([table,handler])=>{
+      sb.channel('rt_'+table)
+        .on('postgres_changes',{event:'*',schema:'public',table},handler)
+        .subscribe((status)=>{
+          if(status==='SUBSCRIBED')setStatus('live');
+        });
+    });
+  }catch(e){
+    console.warn('Realtime unavailable:',e.message);
+    // Fall back to polling every 10 seconds
+    setInterval(()=>pollUpdates(),10000);
+  }
 }
 
 // ══════════════════════════════════════════════════
